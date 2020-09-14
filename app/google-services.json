@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1057071832623",
+    "firebase_url": "https://amblor.firebaseio.com",
+    "project_id": "amblor",
+    "storage_bucket": "amblor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057071832623:android:2d73d4e8ac67f7adc730da",
+        "android_client_info": {
+          "package_name": "com.vanpra.amblor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057071832623-c92rao1qh0a83rg4cac9hnh8tm5jm74c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vanpra.amblor",
+            "certificate_hash": "b183d2dfd5e7ff634d6bea79a0534d91f171761b"
+          }
+        },
+        {
+          "client_id": "1057071832623-t3s83a92tsi66nn7gpfdsnk48cudsmfr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vanpra.amblor",
+            "certificate_hash": "bc40f082427d62478b1ebfa7086a0e80efe6c7f1"
+          }
+        },
+        {
+          "client_id": "1057071832623-heq9qr80p51ktgt73v1sc653im6eu3mh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANoNDoMTJ6fOrRN62zQN708Tu1t86nTvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057071832623-heq9qr80p51ktgt73v1sc653im6eu3mh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
