@@ -8,4 +8,5 @@ buildSrc/.gradle
 
 .idea
 local.properties
+gradle.properties
 
