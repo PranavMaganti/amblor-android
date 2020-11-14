@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
@@ -26,7 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.vanpra.amblor.ViewModelAmbient
+import com.vanpra.amblor.AuthAmbient
 import com.vanpra.amblor.util.ErrorWrapper
 import com.vanpra.amblor.util.SignUpTitle
 import com.vanpra.amblor.util.enabledColor
@@ -36,8 +37,8 @@ import kotlinx.coroutines.launch
 fun GoogleSignup() {
     var username by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     val hostView = ViewAmbient.current
-    val viewModel = ViewModelAmbient.current
     val activity = ContextAmbient.current as AppCompatActivity
+    val authRepo = AuthAmbient.current
 
     var error by mutableStateOf(false)
 
@@ -46,7 +47,7 @@ fun GoogleSignup() {
             .background(MaterialTheme.colors.background)
             .clickable(onClick = { hostView.clearFocus() }, indication = null)
     ) {
-        SignUpTitle(title = "Enter a username") { viewModel.googleSignOut() }
+        SignUpTitle(title = "Enter a username") { authRepo.googleSignOut() }
         Box(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorWrapper(isError = error, errorMessage = "Username Taken") {
                 OutlinedTextField(
@@ -60,10 +61,10 @@ fun GoogleSignup() {
             }
 
             val canSignIn = username.text != ""
-            TextButton(
+            Button(
                 onClick = {
                     activity.lifecycleScope.launch {
-                        viewModel.addNewUser(username.text) { error = true }
+                        authRepo.addNewUser(username.text) { error = true }
                     }
                 },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),

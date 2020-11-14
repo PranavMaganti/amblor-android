@@ -6,8 +6,6 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
@@ -20,16 +18,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextButton
+import androidx.compose.navigation.AmbientNavController
+import androidx.compose.navigation.navigate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
@@ -41,25 +40,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.vanpra.amblor.AmblorState
-import com.vanpra.amblor.LoginState
+import com.vanpra.amblor.AuthAmbient
 import com.vanpra.amblor.R
-import com.vanpra.amblor.ViewModelAmbient
+import com.vanpra.amblor.ui.LoginNavigationState
 import com.vanpra.amblor.util.enabledColor
 import kotlinx.coroutines.launch
-
-@ExperimentalFocus
-@ExperimentalAnimationApi
-@Composable
-fun LoginController() {
-    Crossfade(current = ViewModelAmbient.current.loginState) {
-        when (it) {
-            LoginState.SignIn -> LoginLayout()
-            LoginState.GoogleSignUp -> GoogleSignup()
-            LoginState.EmailSignUp -> EmailSignup()
-        }
-    }
-}
 
 @Composable
 fun LoginLayout() {
@@ -67,19 +52,18 @@ fun LoginLayout() {
     val password = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     val validInput = password.value.text != "" && email.value.text != ""
 
+    val authRepo = AuthAmbient.current
+    val navController = AmbientNavController.current
+
     val hostView = ViewAmbient.current
-    val viewModel = ViewModelAmbient.current
     val activity = ContextAmbient.current as AppCompatActivity
     val result = activity.registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == Activity.RESULT_OK) {
             activity.lifecycleScope.launch {
-                val newUser = viewModel.firebaseAuthWithGoogle(it.data!!)
-                if (newUser) {
-                    viewModel.loginState = LoginState.GoogleSignUp
-                } else {
-                    viewModel.appState = AmblorState.App
+                authRepo.firebaseAuthWithGoogle(it.data!!) {
+                    navController.navigate(LoginNavigationState.GoogleSignUp)
                 }
             }
         }
@@ -93,7 +77,7 @@ fun LoginLayout() {
             indication = null
         ),
         verticalArrangement = Arrangement.Center,
-        horizontalGravity = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         WithConstraints {
             Box(Modifier.width(maxWidth * 0.75f)) {
@@ -153,23 +137,17 @@ fun LoginButtonLayout(
     email: MutableState<TextFieldValue>,
     password: MutableState<TextFieldValue>,
     canSignIn: Boolean,
-    result: ActivityResultLauncher<Intent>
+    result: ActivityResultLauncher<Intent>,
 ) {
     val backgroundColor = MaterialTheme.colors.primaryVariant.enabledColor(canSignIn)
     val textColor = MaterialTheme.colors.onPrimary.enabledColor(canSignIn)
-    val viewModel = ViewModelAmbient.current
 
-    TextButton(
+    val navController = AmbientNavController.current
+    val authRepo = AuthAmbient.current
+
+    Button(
         onClick = {
-            val task =
-                viewModel.auth.signInWithEmailAndPassword(email.value.text, password.value.text)
-            task.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    viewModel.appState = AmblorState.App
-                } else {
-                    println(it.exception)
-                }
-            }
+            authRepo.emailLogin(email.value.text, password.value.text)
         },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         backgroundColor = backgroundColor,
@@ -182,8 +160,8 @@ fun LoginButtonLayout(
         )
     }
 
-    TextButton(
-        onClick = { viewModel.loginState = LoginState.EmailSignUp },
+    Button(
+        onClick = { navController.navigate(LoginNavigationState.EmailSignUp) },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         backgroundColor = MaterialTheme.colors.primaryVariant
     ) {
@@ -194,8 +172,8 @@ fun LoginButtonLayout(
         )
     }
 
-    TextButton(
-        onClick = { result.launch(viewModel.client.signInIntent) },
+    Button(
+        onClick = { result.launch(authRepo.client.signInIntent) },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         elevation = 8.dp,
         backgroundColor = Color.White,

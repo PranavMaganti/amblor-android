@@ -28,7 +28,7 @@ interface ScrobbleDao {
     @Query("SELECT time FROM Scrobble ORDER BY time DESC")
     suspend fun getLastScrobbleTime(): Int?
 
-    suspend fun insertAll(rawScrobbles: List<ScrobbleData>) {
+    suspend fun insertAllScrobbles(rawScrobbles: List<ScrobbleData>) {
         rawScrobbles.forEach {
             println("inserting")
             val track = getTrackByName(it.name, it.artist_names)

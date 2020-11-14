@@ -47,7 +47,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ScrobbleLayout() {
     val viewModel: ScrobbleViewModel = viewModel()
-    val viewState by viewModel.state.collectAsState()
+    val viewState by viewModel.viewState.collectAsState()
 
     LazyColumnForIndexed(
         viewState.scrobbles,
@@ -86,7 +86,7 @@ fun ScrobbleLayout() {
 @Composable
 fun ScrobbleDetailView() {
     val viewModel = viewModel<ScrobbleViewModel>()
-    val viewState by viewModel.state.collectAsState()
+    val viewState by viewModel.viewState.collectAsState()
 
     AnimatedVisibility(
         visible = viewState.showingScrobble,
@@ -126,7 +126,7 @@ private fun ArtistView(artist: Artist, onClick: () -> Unit = {}) {
         Row(
             modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
                 .padding(top = 8.dp, bottom = 8.dp, start = 8.dp),
-            verticalGravity = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             CoilImageWithCrossfade(data = artist.image, Modifier.size(40.dp).clip(CircleShape))
             Spacer(Modifier.width(16.dp))
@@ -159,7 +159,7 @@ private fun ScrobbleItem(modifier: Modifier = Modifier, scrobble: ScrobbleData) 
     ConstraintLayout(modifier) {
         val (content, time) = createRefs()
         Row(
-            verticalGravity = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 8.dp)
                 .constrainAs(content) {
                     centerVerticallyTo(parent)

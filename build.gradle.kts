@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath(Libs.androidGradlePlugin)
         classpath(Libs.Kotlin.gradlePlugin)
-        classpath (Libs.googleServicesPlugin)
+        classpath(Libs.googleServicesPlugin)
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,8 +21,10 @@ allprojects {
         jcenter()
         mavenCentral()
         gradlePluginPortal()
-        maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-        maven { url = uri("https://kotlin.bintray.com/kotlinx/") }
+        maven("https://dl.bintray.com/kotlin/kotlin-eap")
+        maven("https://kotlin.bintray.com/kotlinx/")
+        maven("https://androidx.dev/snapshots/builds/${Libs.AndroidX.Compose.snapshot}/artifacts/ui/repository")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
 

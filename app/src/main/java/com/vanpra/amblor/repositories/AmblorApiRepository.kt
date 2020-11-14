@@ -1,33 +1,37 @@
-package com.vanpra.amblor.service
+package com.vanpra.amblor.repositories
 
-import android.content.SharedPreferences
+import android.content.Context
 import androidx.core.content.edit
-import com.vanpra.amblor.models.*
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.http.content.*
+import androidx.preference.PreferenceManager
+import com.vanpra.amblor.models.NewUser
+import com.vanpra.amblor.models.RefreshedToken
+import com.vanpra.amblor.models.ScrobbleData
+import com.vanpra.amblor.models.ScrobbleQuery
+import com.vanpra.amblor.models.Token
+import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.content.TextContent
+import io.ktor.http.contentType
+import io.ktor.http.takeFrom
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class AmblorApi(private val settings: SharedPreferences) {
+class AmblorApiRepository(context: Context) {
     companion object {
         private const val baseUrl = "https://amblor.vanpra.me/"
 
-        private var instance: AmblorApi? = null
-        fun initalise(sharedPreferences: SharedPreferences) {
-            if (instance == null) {
-                instance = AmblorApi(sharedPreferences)
-            }
-        }
+        private var instance: AmblorApiRepository? = null
 
-        fun getInstance(): AmblorApi {
+        fun getInstance(context: Context): AmblorApiRepository {
             if (instance == null) {
-                throw IllegalAccessException("AmblorApiRepository must be initialised before access")
+                instance = AmblorApiRepository(context)
             }
             return instance!!
         }
@@ -41,6 +45,7 @@ class AmblorApi(private val settings: SharedPreferences) {
             }
         }
     }
+    private val settings = PreferenceManager.getDefaultSharedPreferences(context)
 
     suspend fun addUser(user: NewUser): HttpResponse = client.post {
         url {

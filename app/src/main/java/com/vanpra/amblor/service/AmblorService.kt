@@ -12,6 +12,8 @@ import android.os.Build
 import android.service.notification.NotificationListenerService
 import androidx.core.app.NotificationCompat
 import com.vanpra.amblor.R
+import com.vanpra.amblor.repositories.NotificationRepository
+import com.vanpra.amblor.repositories.NotificationSong
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect

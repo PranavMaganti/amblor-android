@@ -3,6 +3,7 @@ plugins {
     id("com.google.gms.google-services")
     kotlin("android")
     id("kotlin-kapt")
+    id("org.jmailen.kotlinter") version "3.2.0"
 }
 
 android {
@@ -56,7 +57,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
         compose = true
     }
 
@@ -107,9 +107,12 @@ dependencies {
     implementation(Libs.PlayServices.coroutines)
 
     implementation(Libs.AndroidX.Compose.ui)
+    implementation(Libs.AndroidX.Compose.foundation)
+    implementation(Libs.AndroidX.Compose.foundationLayout)
     implementation(Libs.AndroidX.Compose.material)
     implementation(Libs.AndroidX.Compose.tooling)
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
+    implementation(Libs.AndroidX.Compose.navigation)
 
     implementation(Libs.AndroidX.coreKtx)
     implementation(Libs.AndroidX.preference)

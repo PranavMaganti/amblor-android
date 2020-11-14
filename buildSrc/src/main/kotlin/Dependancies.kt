@@ -1,10 +1,10 @@
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha10"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha12"
     const val material = "com.google.android.material:material:1.2.1"
     const val googleServicesPlugin = "com.google.gms:google-services:4.3.3"
 
     object Accompanist {
-        private const val version = "0.2.1"
+        private const val version = "0.2.2.ui-6824694-SNAPSHOT"
         const val coil = "dev.chrisbanes.accompanist:accompanist-coil:$version"
     }
 
@@ -54,12 +54,16 @@ object Libs {
         const val preference = "androidx.preference:preference-ktx:1.1.1"
 
         object Compose {
-            const val version = "1.0.0-alpha02"
+            const val version = "1.0.0-SNAPSHOT"
+            const val snapshot = "6839429"
 
             const val ui = "androidx.compose.ui:ui:$version"
             const val tooling = "androidx.ui:ui-tooling:$version"
+            const val foundation = "androidx.compose.foundation:foundation:$version"
+            const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
             const val material = "androidx.compose.material:material:$version"
             const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$version"
+            const val navigation = "androidx.compose.navigation:navigation:0.1.0-SNAPSHOT"
         }
 
         object Room {

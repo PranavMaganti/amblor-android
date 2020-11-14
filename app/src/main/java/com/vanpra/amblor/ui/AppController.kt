@@ -1,6 +1,5 @@
 package com.vanpra.amblor.ui
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentColorAmbient
@@ -22,6 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.navigation.NavHost
+import androidx.compose.navigation.composable
+import androidx.compose.navigation.navigate
+import androidx.compose.navigation.rememberNavController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,35 +38,37 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.amblor.NavigationState
-import com.vanpra.amblor.ViewModelAmbient
+import androidx.navigation.NavHostController
 import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
-import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleDetailView
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
 
+enum class BottomNavigationState {
+    Scrobbles,
+    Stats,
+    Profile
+}
+
 @ExperimentalAnimationApi
 @Composable
-fun AmblorApp() {
-    val viewModel = ViewModelAmbient.current
-
+fun AppController() {
     Stack {
-        AmblorScaffold {
-            Crossfade(current = viewModel.navigationState) {
-                when (it) {
-                    NavigationState.Scrobbles -> ScrobbleLayout()
-                    NavigationState.Stats -> StatsLayout()
-                    NavigationState.Profile -> ProfileLayout()
-                }
+        val bottomNavController = rememberNavController()
+        AmblorScaffold(bottomNavController) {
+            NavHost(
+                navController = bottomNavController,
+                startDestination = BottomNavigationState.Scrobbles
+            ) {
+                composable(BottomNavigationState.Scrobbles) { ScrobbleLayout() }
+                composable(BottomNavigationState.Stats) { StatsLayout() }
+                composable(BottomNavigationState.Profile) { ProfileLayout() }
             }
         }
-
-        ScrobbleDetailView()
     }
 }
 
 @Composable
-fun AmblorScaffold(children: @Composable () -> Unit) {
+fun AmblorScaffold(bottomNavController: NavHostController, children: @Composable () -> Unit) {
     ConstraintLayout(Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
         val (title, body, bottomNav) = createRefs()
         AmblorTitle(
@@ -90,7 +95,7 @@ fun AmblorScaffold(children: @Composable () -> Unit) {
                 bottom.linkTo(parent.bottom)
                 linkTo(parent.start, parent.end)
                 width = Dimension.fillToConstraints
-            }
+            }, bottomNavController
         )
     }
 }
@@ -99,7 +104,7 @@ fun AmblorScaffold(children: @Composable () -> Unit) {
 fun AmblorTitle(modifier: Modifier = Modifier) {
     Row(
         modifier.fillMaxWidth().height(56.dp),
-        verticalGravity = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
@@ -111,18 +116,17 @@ fun AmblorTitle(modifier: Modifier = Modifier) {
     }
 }
 
-data class NavigationItem(val name: String, val icon: VectorAsset, val state: NavigationState)
+data class NavigationItem(val name: String, val icon: VectorAsset, val state: BottomNavigationState)
 
 @Composable
-fun AmblorNavigation(modifier: Modifier = Modifier) {
+fun AmblorNavigation(modifier: Modifier = Modifier, bottomNavController: NavHostController) {
     var selectedIndex by savedInstanceState { 0 }
-    val viewModel = ViewModelAmbient.current
 
     val items = remember {
         listOf(
-            NavigationItem("Scrobbles", Icons.Default.Album, NavigationState.Scrobbles),
-            NavigationItem("Stats", Icons.Default.BarChart, NavigationState.Stats),
-            NavigationItem("Profile", Icons.Default.AccountCircle, NavigationState.Profile)
+            NavigationItem("Scrobbles", Icons.Default.Album, BottomNavigationState.Scrobbles),
+            NavigationItem("Stats", Icons.Default.BarChart, BottomNavigationState.Stats),
+            NavigationItem("Profile", Icons.Default.AccountCircle, BottomNavigationState.Profile)
         )
     }
 
@@ -139,8 +143,8 @@ fun AmblorNavigation(modifier: Modifier = Modifier) {
                 label = { Text(it.name, color = ContentColorAmbient.current) },
                 alwaysShowLabels = false,
                 selected = index == selectedIndex,
-                onSelect = {
-                    viewModel.navigationState = items[index].state
+                onClick = {
+                    bottomNavController.navigate(it.state)
                     selectedIndex = index
                 },
                 selectedContentColor = MaterialTheme.colors.primaryVariant,

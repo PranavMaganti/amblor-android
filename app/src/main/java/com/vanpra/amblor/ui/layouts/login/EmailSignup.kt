@@ -13,12 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.navigation.AmbientNavController
+import androidx.compose.navigation.navigate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,18 +39,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.vanpra.amblor.LoginState
-import com.vanpra.amblor.SharedViewModel
-import com.vanpra.amblor.ViewModelAmbient
+import com.vanpra.amblor.AuthAmbient
+import com.vanpra.amblor.ui.LoginNavigationState
 import com.vanpra.amblor.util.ErrorWrapper
 import com.vanpra.amblor.util.SignUpTitle
 import com.vanpra.amblor.util.enabledColor
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.util.regex.Pattern
 
 class EmailSignupModel {
@@ -94,16 +90,18 @@ class EmailSignupModel {
 @ExperimentalFocus
 @Composable
 fun EmailSignup() {
-    val viewModel = ViewModelAmbient.current
     val hostView = ViewAmbient.current
 
     val signupModel = remember { EmailSignupModel() }
     var showingPasswordList by remember { mutableStateOf(false) }
 
+    val authRepo = AuthAmbient.current
+    val navController = AmbientNavController.current
+
     Column(
         Modifier.clickable(onClick = { hostView.clearFocus() }, indication = null).fillMaxSize()
     ) {
-        SignUpTitle(title = "Sign up") { viewModel.loginState = LoginState.SignIn }
+        SignUpTitle(title = "Sign up") { navController.navigate(LoginNavigationState.Login) }
         Box(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorWrapper(
                 isError = !signupModel.isEmailValid() || signupModel.emailUsed,
@@ -168,8 +166,8 @@ fun EmailSignup() {
                 )
             }
 
-            TextButton(
-                onClick = { startSignup(signupModel, viewModel) },
+            Button(
+                onClick = { authRepo.emailSignup(signupModel) },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                 backgroundColor = signupModel.buttonBackgroundColor(),
                 enabled = signupModel.detailsValid()
@@ -182,26 +180,6 @@ fun EmailSignup() {
             }
         }
     }
-}
-
-private fun startSignup(
-    signupModel: EmailSignupModel,
-    viewModel: SharedViewModel
-) {
-    viewModel.auth
-        .createUserWithEmailAndPassword(signupModel.email, signupModel.password)
-        .addOnCompleteListener {
-            if (it.isSuccessful) {
-                viewModel.viewModelScope.launch {
-                    viewModel.addNewUser(signupModel.username) {
-                        signupModel.usernameUsed = true
-                        Firebase.auth.currentUser!!.delete().await()
-                    }
-                }
-            } else if (it.exception is FirebaseAuthUserCollisionException) {
-                signupModel.emailUsed = true
-            }
-        }
 }
 
 @ExperimentalAnimationApi

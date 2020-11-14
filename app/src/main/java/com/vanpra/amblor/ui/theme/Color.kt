@@ -8,4 +8,5 @@ val blue700 = Color(0xFF1976D2)
 
 val gray800 = Color(0xFF494949)
 val gray900 = Color(0xFF161616)
-val darkBackground = Color(0xFF0A0A0A)
+val darkBackground = Color(0xFF0c0d14)
+    // Color(0xFF0A0A0A)

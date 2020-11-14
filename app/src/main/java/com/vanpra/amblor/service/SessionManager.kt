@@ -7,6 +7,8 @@ import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import com.vanpra.amblor.models.ScrobbleQuery
+import com.vanpra.amblor.repositories.NotificationRepository
+import com.vanpra.amblor.repositories.NotificationSong
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -74,7 +76,7 @@ class MediaCallback(context: Context, private val controller: MediaController) :
                 )
 
                 val scrobble = notificationRepository.amblorApi.scrobble(query)
-                notificationRepository.scrobbleDao.insertAll(listOf(scrobble))
+                notificationRepository.scrobbleDao.insertAllScrobbles(listOf(scrobble))
             }
             currentSong.scrobbled = true
         }

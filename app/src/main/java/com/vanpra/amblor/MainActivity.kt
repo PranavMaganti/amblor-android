@@ -4,40 +4,74 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.navigation.ComposeNavigator
+import androidx.compose.navigation.NavHost
+import androidx.compose.navigation.composable
+import androidx.compose.navigation.navigate
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.onCommit
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.platform.setContent
-import androidx.lifecycle.ViewModelProvider
-import androidx.preference.PreferenceManager
-import com.google.firebase.FirebaseApp
-import com.vanpra.amblor.service.AmblorApi
+import androidx.core.view.WindowCompat
+import androidx.navigation.NavHostController
+import com.vanpra.amblor.repositories.AuthRepository
 import com.vanpra.amblor.service.AmblorService
-import com.vanpra.amblor.ui.AmblorApp
-import com.vanpra.amblor.ui.layouts.login.LoginController
+import com.vanpra.amblor.ui.AppController
+import com.vanpra.amblor.ui.LoginController
 import com.vanpra.amblor.ui.theme.AmblorTheme
+import com.vanpra.amblor.util.ProvideDisplayInsets
+import com.vanpra.amblor.util.systemBarsPadding
 
-val ViewModelAmbient = ambientOf<SharedViewModel> { error("No viewmodel provided") }
+val AuthAmbient = ambientOf<AuthRepository> { error("AuthAmbient not initialised") }
+
+enum class MainNavigationState {
+    Login,
+    App
+}
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var sharedViewModel: SharedViewModel
-
     @ExperimentalAnimationApi
     @ExperimentalFocus
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AmblorApi.initalise(PreferenceManager.getDefaultSharedPreferences(application))
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        val mainNavController = NavHostController(this).apply {
+            navigatorProvider.addNavigator(ComposeNavigator())
+        }
+        mainNavController.enableOnBackPressed(false)
+        val authRepository = AuthRepository(applicationContext, mainNavController)
+
         setContent {
-            AmblorTheme {
-                Providers(ViewModelAmbient provides sharedViewModel) {
-                    Crossfade(current = sharedViewModel.appState) {
-                        when (it) {
-                            AmblorState.Login -> LoginController()
-                            AmblorState.App -> AmblorApp()
+            Providers(AuthAmbient provides authRepository) {
+                AmblorTheme {
+                    ProvideDisplayInsets {
+                        Box(
+                            Modifier.fillMaxSize().background(MaterialTheme.colors.background)
+                                .systemBarsPadding()
+                        ) {
+                            NavHost(
+                                navController = mainNavController,
+                                startDestination = MainNavigationState.Login
+                            ) {
+                                composable(MainNavigationState.Login) { LoginController() }
+                                composable(MainNavigationState.App) { AppController() }
+                            }
+                        }
+
+
+                        onCommit {
+                            val currentUser = authRepository.auth.currentUser
+                            if (currentUser != null) {
+                                mainNavController.navigate(MainNavigationState.App)
+                            }
                         }
                     }
                 }
@@ -54,18 +88,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 startService(intent)
             }
-        }
-
-        val currentUser = sharedViewModel.auth.currentUser
-        if (currentUser != null) {
-            sharedViewModel.appState = AmblorState.App
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (sharedViewModel.appState == AmblorState.Login) {
-            sharedViewModel.googleSignOut()
         }
     }
 }

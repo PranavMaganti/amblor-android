@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun BackButton(onClick: () -> Unit) {
-    Row(Modifier.height(56.dp), verticalGravity = Alignment.CenterVertically) {
+    Row(Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically) {
         Image(
             Icons.Default.ArrowBack,
             modifier = Modifier.size(40.dp).clickable(onClick = onClick).padding(start = 8.dp),
@@ -44,13 +44,13 @@ fun SignUpTitle(title: String, onBackClick: () -> Unit) {
             Image(
                 Icons.Default.ChevronLeft,
                 colorFilter = MaterialTheme.colors.onBackground.filter(),
-                modifier = Modifier.gravity(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center)
             )
         }
 
         Text(
             title,
-            modifier = Modifier.gravity(Alignment.Center),
+            modifier = Modifier.align(Alignment.Center),
             color = MaterialTheme.colors.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
