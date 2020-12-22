@@ -42,12 +42,12 @@ android {
         }
     }
 
-//    packagingOptions {
-//        exclude("META-INF/LICENSE")
-//        exclude("META-INF/AL2.0")
-//        exclude("META-INF/**")
-//        exclude("META-INF/*.kotlin_module")
-//    }
+   packagingOptions.apply {
+       exclude("META-INF/LICENSE")
+       exclude("META-INF/AL2.0")
+       exclude("META-INF/**")
+       exclude("META-INF/*.kotlin_module")
+   }
 
     buildTypes {
         getByName("release") {

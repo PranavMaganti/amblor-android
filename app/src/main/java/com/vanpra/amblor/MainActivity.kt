@@ -30,8 +30,6 @@ import com.vanpra.amblor.ui.theme.AmblorTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.systemBarsPadding
 
-val AmbientAuth = ambientOf<AuthRepository> { error("AuthAmbient not initialised") }
-
 sealed class Screen(val title: String) {
     object App : Screen("App")
     object Auth : Screen("Auth")

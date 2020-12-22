@@ -6,8 +6,8 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,15 +18,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CheckboxDefaults.colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,18 +35,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.unit.sp
 import com.vanpra.amblor.R
 import com.vanpra.amblor.util.enabledColor
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginLayout() {
@@ -62,18 +62,17 @@ fun LoginLayout() {
         }
     }
 
-    Column(
+    Box(
         Modifier.fillMaxSize().clickable(
             onClick = {
                 hostView.clearFocus()
             },
             indication = null
         ),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
         WithConstraints {
-            Box(Modifier.width(maxWidth * 0.75f)) {
+            Column(Modifier.width(maxWidth * 0.75f)) {
                 Image(
                     vectorResource(R.drawable.logo),
                     modifier = Modifier
@@ -105,7 +104,8 @@ fun LoginInputLayout(
             if (imeAction == ImeAction.Next) {
                 // Add focus change after API is added
             }
-        }
+        },
+        textStyle = TextStyle(color =  MaterialTheme.colors.onBackground, fontSize = 16.sp)
     )
 
     OutlinedTextField(
@@ -119,7 +119,8 @@ fun LoginInputLayout(
             if (imeAction == ImeAction.Done) {
                 hostView.clearFocus()
             }
-        }
+        },
+        textStyle = TextStyle(MaterialTheme.colors.onBackground)
     )
 }
 
@@ -130,28 +131,25 @@ fun LoginButtonLayout(
     canSignIn: Boolean,
     result: ActivityResultLauncher<Intent>,
 ) {
-    val backgroundColor = MaterialTheme.colors.primaryVariant.enabledColor(canSignIn)
-    val textColor = MaterialTheme.colors.onPrimary.enabledColor(canSignIn)
-
     Button(
         onClick = {
-            authRepo.emailLogin(email.value.text, password.value.text)
+            //Login email.value.text, password.value.text
         },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        backgroundColor = backgroundColor,
         enabled = canSignIn
     ) {
         Text(
             "Sign in",
             Modifier.wrapContentWidth(Alignment.CenterHorizontally),
-            color = textColor
         )
     }
 
     Button(
-        onClick = { navController.navigate(LoginNavigationState.EmailSignUp) },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        backgroundColor = MaterialTheme.colors.primaryVariant
+        onClick = {
+            // Navigate to EmailSignup
+        },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            .background(MaterialTheme.colors.primaryVariant)
     ) {
         Text(
             "Sign up",
@@ -161,16 +159,16 @@ fun LoginButtonLayout(
     }
 
     Button(
-        onClick = { result.launch(authRepo.client.signInIntent) },
+        onClick = {
+            // result.launch(authRepo.client.signInIntent)
+        },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        elevation = 8.dp,
-        backgroundColor = Color.White,
-        contentColor = Color.DarkGray
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
     ) {
         Image(
             vectorResource(R.drawable.ic_google_icon),
             modifier = Modifier.height(20.dp).padding(end = 16.dp)
         )
-        Text("Sign in with Google")
+        Text("Sign in with Google", color=Color.DarkGray)
     }
 }

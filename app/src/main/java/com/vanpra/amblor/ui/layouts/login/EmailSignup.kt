@@ -3,25 +3,24 @@ package com.vanpra.amblor.ui.layouts.login
 import android.util.Patterns
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.navigation.AmbientNavController
-import androidx.compose.navigation.navigate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,18 +28,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.vanpra.amblor.AuthAmbient
-import com.vanpra.amblor.ui.LoginNavigationState
 import com.vanpra.amblor.util.ErrorWrapper
 import com.vanpra.amblor.util.SignUpTitle
 import com.vanpra.amblor.util.enabledColor
@@ -87,21 +83,20 @@ class EmailSignupModel {
 }
 
 @ExperimentalAnimationApi
-@ExperimentalFocus
 @Composable
 fun EmailSignup() {
-    val hostView = ViewAmbient.current
+    val hostView = AmbientView.current
 
     val signupModel = remember { EmailSignupModel() }
     var showingPasswordList by remember { mutableStateOf(false) }
 
-    val authRepo = AuthAmbient.current
-    val navController = AmbientNavController.current
-
     Column(
         Modifier.clickable(onClick = { hostView.clearFocus() }, indication = null).fillMaxSize()
     ) {
-        SignUpTitle(title = "Sign up") { navController.navigate(LoginNavigationState.Login) }
+        SignUpTitle(title = "Sign up") {
+            // Navigate to main Login
+        }
+
         Box(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorWrapper(
                 isError = !signupModel.isEmailValid() || signupModel.emailUsed,
@@ -112,7 +107,6 @@ fun EmailSignup() {
                     onValueChange = { value -> signupModel.email = value },
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    imeAction = ImeAction.Next,
                     isErrorValue = !signupModel.isEmailValid() || signupModel.emailUsed,
                     onTextInputStarted = {
                         signupModel.emailUsed = false
@@ -126,7 +120,6 @@ fun EmailSignup() {
                     onValueChange = { value -> signupModel.username = value },
                     label = { Text("Username") },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    imeAction = ImeAction.Next,
                     isErrorValue = signupModel.usernameUsed,
                     onTextInputStarted = {
                         signupModel.usernameUsed = false
@@ -139,11 +132,10 @@ fun EmailSignup() {
                 onValueChange = { value -> signupModel.password = value },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).focusObserver {
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).onFocusChanged {
                     showingPasswordList = it.isFocused
                 },
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 isErrorValue = !signupModel.isPasswordValid(),
             )
 
@@ -159,17 +151,21 @@ fun EmailSignup() {
                     label = { Text("Confirm Password") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
                     isErrorValue = !signupModel.passwordsMatch() &&
                         signupModel.confirmPassword.isNotEmpty()
                 )
             }
 
             Button(
-                onClick = { authRepo.emailSignup(signupModel) },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-                backgroundColor = signupModel.buttonBackgroundColor(),
+                onClick = {
+                    // Signup with email and password
+                },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
+                    .background(signupModel.buttonBackgroundColor()),
                 enabled = signupModel.detailsValid()
             ) {
                 Text(

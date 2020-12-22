@@ -1,12 +1,12 @@
 package com.vanpra.amblor.util
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,7 +39,7 @@ fun BackButton(onClick: () -> Unit) {
 
 @Composable
 fun SignUpTitle(title: String, onBackClick: () -> Unit) {
-    Stack(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+    Box(Modifier.fillMaxWidth().padding(top = 8.dp)) {
         IconButton(onClick = { onBackClick() }) {
             Image(
                 Icons.Default.ChevronLeft,

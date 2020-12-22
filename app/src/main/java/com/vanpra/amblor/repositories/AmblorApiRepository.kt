@@ -9,8 +9,6 @@ import com.vanpra.amblor.models.ScrobbleData
 import com.vanpra.amblor.models.ScrobbleQuery
 import com.vanpra.amblor.models.Token
 import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -20,8 +18,6 @@ import io.ktor.http.content.TextContent
 import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 class AmblorApiRepository(context: Context) {
     companion object {
@@ -40,9 +36,6 @@ class AmblorApiRepository(context: Context) {
     private val client by lazy {
         HttpClient {
             expectSuccess = false
-            install(JsonFeature) {
-                serializer = KotlinxSerializer()
-            }
         }
     }
     private val settings = PreferenceManager.getDefaultSharedPreferences(context)
@@ -93,9 +86,6 @@ class AmblorApiRepository(context: Context) {
                 encodedPath = "api/v1/refresh"
             }
             contentType(ContentType.Application.Json)
-            body = buildJsonObject {
-                put("refresh_token", refreshToken)
-            }
         }
 
         settings.edit(commit = true) {

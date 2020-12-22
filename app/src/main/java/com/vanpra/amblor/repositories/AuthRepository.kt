@@ -2,8 +2,8 @@ package com.vanpra.amblor.repositories
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.navigation.navigate
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -13,8 +13,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.vanpra.amblor.BuildConfig
-import com.vanpra.amblor.MainNavigationState
-import com.vanpra.amblor.data.AmblorDatabase
+import com.vanpra.amblor.Screen
 import com.vanpra.amblor.models.NewUser
 import com.vanpra.amblor.ui.layouts.login.EmailSignupModel
 import io.ktor.http.HttpStatusCode
@@ -41,7 +40,7 @@ class AuthRepository(context: Context, private val mainNavController: NavHostCon
         if (amblorApi.isNewUser(tokenId)) {
             onNewUser()
         } else {
-            mainNavController.navigate(MainNavigationState.App)
+            mainNavController.navigate(route = Screen.App.title)
         }
     }
 
@@ -53,7 +52,7 @@ class AuthRepository(context: Context, private val mainNavController: NavHostCon
         if (res.status == HttpStatusCode.Conflict) {
             onConflict()
         } else {
-            mainNavController.navigate(MainNavigationState.App)
+            mainNavController.navigate(route = Screen.App.title)
         }
     }
 
@@ -77,7 +76,7 @@ class AuthRepository(context: Context, private val mainNavController: NavHostCon
         auth.signInWithEmailAndPassword(username, password)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    mainNavController.navigate(MainNavigationState.App)
+                    mainNavController.navigate(route = Screen.App.title)
                 } else {
                     println(it.exception)
                 }
@@ -88,7 +87,7 @@ class AuthRepository(context: Context, private val mainNavController: NavHostCon
     fun googleSignOut() {
         Firebase.auth.signOut()
         client.signOut().addOnCompleteListener {
-            mainNavController.navigate(MainNavigationState.Login)
+            mainNavController.navigate(route = Screen.Login.title)
         }
     }
 }

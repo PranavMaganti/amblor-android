@@ -1,6 +1,6 @@
 package com.vanpra.amblor.util
 
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -14,7 +14,7 @@ import java.time.LocalDate
 fun Color.enabledColor(bool: Boolean): Color = if (bool) {
     this
 } else {
-    EmphasisAmbient.current.disabled.applyEmphasis(this)
+    this.copy(ContentAlpha.disabled)
 }
 
 @Composable

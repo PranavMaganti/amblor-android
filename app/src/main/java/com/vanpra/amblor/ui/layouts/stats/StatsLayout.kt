@@ -7,5 +7,5 @@ import androidx.compose.ui.viewinterop.viewModel
 @Composable
 fun StatsLayout() {
     val viewModel = viewModel<StatsViewModel>()
-    val viewState = viewModel.viewState.collectAsState()
+    // val viewState = viewModel.viewState.collectAsState()
 }

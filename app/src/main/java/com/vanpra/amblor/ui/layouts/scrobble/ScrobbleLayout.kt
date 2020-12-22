@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +33,7 @@ import androidx.compose.ui.viewinterop.viewModel
 import com.vanpra.amblor.models.ScrobbleData
 import com.vanpra.amblor.util.BackButton
 import com.vanpra.amblor.util.toJavaDate
-import dev.chrisbanes.accompanist.coil.CoilImageWithCrossfade
+import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -49,35 +48,36 @@ fun ScrobbleLayout() {
     val viewModel: ScrobbleViewModel = viewModel()
     val viewState by viewModel.viewState.collectAsState()
 
-    LazyColumnForIndexed(
-        viewState.scrobbles,
+    LazyColumn(
         modifier = Modifier.fillMaxSize()
-    ) { index, item ->
-        Column {
-            val currentDate = Instant.fromEpochSeconds(item.time.toLong()).toJavaDate()
-            val previousDate = if (index != 0) {
-                Instant.fromEpochSeconds(viewState.scrobbles[index - 1].time.toLong())
-                    .toJavaDate()
-            } else {
-                null
-            }
-            val topPadding = if (index == 0) 0.dp else 12.dp
+    ) {
+        itemsIndexed(viewState.scrobbles) { index, item ->
+            Column {
+                val currentDate = Instant.fromEpochSeconds(item.time.toLong()).toJavaDate()
+                val previousDate = if (index != 0) {
+                    Instant.fromEpochSeconds(viewState.scrobbles[index - 1].time.toLong())
+                        .toJavaDate()
+                } else {
+                    null
+                }
+                val topPadding = if (index == 0) 0.dp else 12.dp
 
-            if (currentDate != previousDate) {
-                ScrobleDateTitle(
-                    Modifier.padding(start = 8.dp, bottom = 4.dp, top = topPadding),
-                    currentDate
+                if (currentDate != previousDate) {
+                    ScrobleDateTitle(
+                        Modifier.padding(start = 8.dp, bottom = 4.dp, top = topPadding),
+                        currentDate
+                    )
+                }
+
+                ScrobbleItem(
+                    Modifier.fillMaxWidth().clickable(
+                        onClick = {
+                            viewModel.openScrobbleView(item)
+                        }
+                    ),
+                    item
                 )
             }
-
-            ScrobbleItem(
-                Modifier.fillMaxWidth().clickable(
-                    onClick = {
-                        viewModel.openScrobbleView(item)
-                    }
-                ),
-                item
-            )
         }
     }
 }
@@ -99,7 +99,7 @@ fun ScrobbleDetailView() {
                 viewModel.closeScrobbleView()
             }
             Spacer(Modifier.height(8.dp))
-            CoilImageWithCrossfade(
+            CoilImage(
                 data = viewState.selectedScrobble.image,
                 Modifier.padding(horizontal = 24.dp).fillMaxWidth()
             )
@@ -113,8 +113,10 @@ fun ScrobbleDetailView() {
                 maxLines = 1
             )
             Spacer(Modifier.height(4.dp))
-            LazyColumnFor(Artist.from(viewState.selectedScrobble)) {
-                ArtistView(it)
+            LazyColumn {
+                items(Artist.from(viewState.selectedScrobble)) {
+                    ArtistView(it)
+                }
             }
         }
     }
@@ -128,7 +130,7 @@ private fun ArtistView(artist: Artist, onClick: () -> Unit = {}) {
                 .padding(top = 8.dp, bottom = 8.dp, start = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CoilImageWithCrossfade(data = artist.image, Modifier.size(40.dp).clip(CircleShape))
+            CoilImage(data = artist.image, Modifier.size(40.dp).clip(CircleShape))
             Spacer(Modifier.width(16.dp))
             Text(
                 artist.name,
@@ -169,7 +171,7 @@ private fun ScrobbleItem(modifier: Modifier = Modifier, scrobble: ScrobbleData) 
                     height = Dimension.wrapContent
                 }
         ) {
-            CoilImageWithCrossfade(data = scrobble.image, modifier = Modifier.size(50.dp))
+            CoilImage(data = scrobble.image, modifier = Modifier.size(50.dp))
             Column(Modifier.padding(start = 8.dp)) {
                 Text(scrobble.name, color = MaterialTheme.colors.onBackground, maxLines = 1)
                 Spacer(modifier = Modifier.height(2.dp))
