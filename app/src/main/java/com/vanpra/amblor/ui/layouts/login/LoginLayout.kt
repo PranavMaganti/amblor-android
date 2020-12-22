@@ -6,11 +6,11 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Box
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,21 +18,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.navigation.AmbientNavController
-import androidx.compose.navigation.navigate
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,9 +43,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.vanpra.amblor.AuthAmbient
 import com.vanpra.amblor.R
-import com.vanpra.amblor.ui.LoginNavigationState
 import com.vanpra.amblor.util.enabledColor
 import kotlinx.coroutines.launch
 
@@ -52,20 +53,12 @@ fun LoginLayout() {
     val password = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     val validInput = password.value.text != "" && email.value.text != ""
 
-    val authRepo = AuthAmbient.current
-    val navController = AmbientNavController.current
-
-    val hostView = ViewAmbient.current
-    val activity = ContextAmbient.current as AppCompatActivity
+    val hostView = AmbientView.current
+    val activity = AmbientContext.current as AppCompatActivity
     val result = activity.registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == Activity.RESULT_OK) {
-            activity.lifecycleScope.launch {
-                authRepo.firebaseAuthWithGoogle(it.data!!) {
-                    navController.navigate(LoginNavigationState.GoogleSignUp)
-                }
-            }
         }
     }
 
@@ -88,8 +81,8 @@ fun LoginLayout() {
                         .fillMaxWidth(),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
                 )
-                LoginInputLayout(email = email, password = password, hostView = hostView)
-                LoginButtonLayout(email, password, canSignIn = validInput, result)
+                LoginInputLayout(email, password, hostView)
+                LoginButtonLayout(email, password, validInput, result)
             }
         }
     }
@@ -108,7 +101,6 @@ fun LoginInputLayout(
         modifier = Modifier
             .padding(bottom = 16.dp)
             .fillMaxWidth(),
-        imeAction = ImeAction.Next,
         onImeActionPerformed = { imeAction, _ ->
             if (imeAction == ImeAction.Next) {
                 // Add focus change after API is added
@@ -122,8 +114,7 @@ fun LoginInputLayout(
         label = { Text("Password") },
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-        keyboardType = KeyboardType.Password,
-        imeAction = ImeAction.Done,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         onImeActionPerformed = { imeAction, _ ->
             if (imeAction == ImeAction.Done) {
                 hostView.clearFocus()
@@ -141,9 +132,6 @@ fun LoginButtonLayout(
 ) {
     val backgroundColor = MaterialTheme.colors.primaryVariant.enabledColor(canSignIn)
     val textColor = MaterialTheme.colors.onPrimary.enabledColor(canSignIn)
-
-    val navController = AmbientNavController.current
-    val authRepo = AuthAmbient.current
 
     Button(
         onClick = {

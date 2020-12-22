@@ -21,6 +21,8 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.text.input.ImeAction
@@ -36,8 +38,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun GoogleSignup() {
     var username by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    val hostView = ViewAmbient.current
-    val activity = ContextAmbient.current as AppCompatActivity
+    val hostView = AmbientView.current
+    val activity = AmbientContext.current as AppCompatActivity
     val authRepo = AuthAmbient.current
 
     var error by mutableStateOf(false)

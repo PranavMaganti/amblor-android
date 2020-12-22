@@ -13,7 +13,8 @@
         android:label="@string/app_name">
         <activity
             android:name="com.vanpra.amblor.MainActivity"
-            android:theme="@style/Theme.Amblor">
+            android:theme="@style/Theme.Amblor"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category

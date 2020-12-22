@@ -8,26 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1057071832623:android:2d73d4e8ac67f7adc730da",
+        "mobilesdk_app_id": "1:1057071832623:android:f63b4cc9b3c962cec730da",
         "android_client_info": {
           "package_name": "com.vanpra.amblor"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1057071832623-c92rao1qh0a83rg4cac9hnh8tm5jm74c.apps.googleusercontent.com",
+          "client_id": "1057071832623-1rhel42r2h13m3lbv2td82k8t7ncn3c0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.vanpra.amblor",
-            "certificate_hash": "b183d2dfd5e7ff634d6bea79a0534d91f171761b"
-          }
-        },
-        {
-          "client_id": "1057071832623-t3s83a92tsi66nn7gpfdsnk48cudsmfr.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.vanpra.amblor",
-            "certificate_hash": "bc40f082427d62478b1ebfa7086a0e80efe6c7f1"
+            "certificate_hash": "a7a7f32584dd195555e65f2100381f135577ce5d"
           }
         },
         {

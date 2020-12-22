@@ -23,8 +23,6 @@ allprojects {
         gradlePluginPortal()
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
         maven("https://kotlin.bintray.com/kotlinx/")
-        maven("https://androidx.dev/snapshots/builds/${Libs.AndroidX.Compose.snapshot}/artifacts/ui/repository")
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
 

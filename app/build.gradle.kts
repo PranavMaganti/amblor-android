@@ -8,7 +8,7 @@ plugins {
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.1"
+    buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.vanpra.amblor"
@@ -42,12 +42,12 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude("META-INF/LICENSE")
-        exclude("META-INF/AL2.0")
-        exclude("META-INF/**")
-        exclude("META-INF/*.kotlin_module")
-    }
+//    packagingOptions {
+//        exclude("META-INF/LICENSE")
+//        exclude("META-INF/AL2.0")
+//        exclude("META-INF/**")
+//        exclude("META-INF/*.kotlin_module")
+//    }
 
     buildTypes {
         getByName("release") {
@@ -124,6 +124,7 @@ dependencies {
     implementation(Libs.material)
 
     implementation(Libs.Accompanist.coil)
+    implementation(Libs.Accompanist.insets)
 
     implementation(Libs.AndroidX.Room.runtime)
     implementation(Libs.AndroidX.Room.ktx)
