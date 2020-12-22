@@ -8,6 +8,7 @@ buildSrc/.gradle
 
 .idea
 local.properties
+gradle.properties
 
 app/google-services.json
 
