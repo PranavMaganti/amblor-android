@@ -75,8 +75,8 @@ class MediaCallback(context: Context, private val controller: MediaController) :
                     Instant.now().epochSecond.toInt()
                 )
 
-                val scrobble = notificationRepository.amblorApi.scrobble(query)
-                notificationRepository.scrobbleDao.insertAllScrobbles(listOf(scrobble))
+                // val scrobble = notificationRepository.amblorApi.scrobble(query)
+                // notificationRepository.scrobbleDao.insertAllScrobbles(listOf(scrobble))
             }
             currentSong.scrobbled = true
         }

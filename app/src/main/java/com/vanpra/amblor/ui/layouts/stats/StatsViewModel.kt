@@ -2,13 +2,6 @@ package com.vanpra.amblor.ui.layouts.stats
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.vanpra.amblor.data.AmblorDatabase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 // enum class StatsNavigationState {
 //     Day,
@@ -23,7 +16,7 @@ import kotlinx.coroutines.launch
 //     val refreshing: Boolean = false
 // )
 
-class StatsViewModel(application: Application): AndroidViewModel(application) {
+class StatsViewModel(application: Application) : AndroidViewModel(application) {
     // private val statsDao = AmblorDatabase.getDatabase(application.applicationContext).statsDao()
     //
     // private val navState = MutableStateFlow(StatsNavigationState.Day)

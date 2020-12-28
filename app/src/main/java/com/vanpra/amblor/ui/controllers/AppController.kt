@@ -1,4 +1,4 @@
-package com.vanpra.amblor.ui
+package com.vanpra.amblor.ui.controllers
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -38,6 +38,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
+import com.vanpra.amblor.AmbientNavHostController
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
@@ -47,15 +48,16 @@ import com.vanpra.amblor.ui.layouts.stats.StatsLayout
 @Composable
 fun AppController() {
     Box {
+        val mainNavController = AmbientNavHostController.current
         val bottomNavController = rememberNavController()
         AmblorScaffold(bottomNavController) {
             NavHost(
                 navController = bottomNavController,
-                startDestination = Screen.Scrobbles.title
+                startDestination = Screen.Scrobbles.route
             ) {
-                composable(Screen.Scrobbles.title) { ScrobbleLayout() }
-                composable(Screen.Stats.title) { StatsLayout() }
-                composable(Screen.Profile.title) { ProfileLayout() }
+                composable(Screen.Scrobbles.route) { ScrobbleLayout() }
+                composable(Screen.Stats.route) { StatsLayout() }
+                composable(Screen.Profile.route) { ProfileLayout(mainNavController) }
             }
         }
     }
@@ -89,7 +91,8 @@ fun AmblorScaffold(bottomNavController: NavHostController, children: @Composable
                 bottom.linkTo(parent.bottom)
                 linkTo(parent.start, parent.end)
                 width = Dimension.fillToConstraints
-            }, bottomNavController
+            },
+            bottomNavController
         )
     }
 }
@@ -138,7 +141,7 @@ fun AmblorNavigation(modifier: Modifier = Modifier, bottomNavController: NavHost
                 alwaysShowLabels = false,
                 selected = index == selectedIndex,
                 onClick = {
-                    bottomNavController.navigate(route = it.state.title)
+                    bottomNavController.navigate(route = it.state.route)
                     selectedIndex = index
                 },
                 selectedContentColor = MaterialTheme.colors.primaryVariant,

@@ -2,6 +2,8 @@ package com.vanpra.amblor.util
 
 import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import kotlinx.datetime.Instant
@@ -22,3 +24,8 @@ fun Color.filter() = ColorFilter.tint(this)
 
 fun Instant.toJavaDate(): LocalDate =
     this.toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime().toLocalDate()
+
+fun FocusManager.switchFocus(focusRequester: FocusRequester) {
+    this.clearFocus()
+    focusRequester.requestFocus()
+}

@@ -38,7 +38,7 @@ android {
             storeFile = file(rootProject.extra["release_keystore"] as String)
             storePassword = rootProject.extra["release_keystore_password"] as String
             keyPassword = rootProject.extra["release_key_password"] as String
-            keyAlias = "amblor"
+            keyAlias = "release"
         }
     }
 
@@ -113,6 +113,7 @@ dependencies {
     implementation(Libs.AndroidX.Compose.tooling)
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
     implementation(Libs.AndroidX.Compose.navigation)
+    androidTestImplementation(Libs.AndroidX.Compose.test)
 
     implementation(Libs.AndroidX.coreKtx)
     implementation(Libs.AndroidX.preference)
@@ -134,4 +135,10 @@ dependencies {
     implementation(Libs.Ktor.json)
     implementation(Libs.Ktor.android)
     implementation(Libs.Ktor.serialization)
+
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("org.mockito:mockito-core:3.6.28")
+    testImplementation("androidx.test:core:1.3.1-alpha02")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3-alpha02")
+
 }

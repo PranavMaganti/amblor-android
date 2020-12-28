@@ -1,7 +1,7 @@
 object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha03"
     const val material = "com.google.android.material:material:1.3.0-beta01"
-    const val googleServicesPlugin = "com.google.gms:google-services:4.3.2"
+    const val googleServicesPlugin = "com.google.gms:google-services:4.3.4"
 
     object Accompanist {
         private const val version = "0.4.1"
@@ -32,7 +32,7 @@ object Libs {
     }
 
     object Ktor {
-        private const val version = "1.4.0"
+        private const val version = "1.5.0"
 
         const val cio = "io.ktor:ktor-client-cio:$version"
         const val json = "io.ktor:ktor-client-json:$version"
@@ -62,6 +62,7 @@ object Libs {
             const val material = "androidx.compose.material:material:$version"
             const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$version"
             const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha04"
+            const val test = "androidx.compose.ui:ui-test:$version"
         }
 
         object Room {
