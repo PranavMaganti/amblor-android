@@ -1,6 +1,5 @@
 package com.vanpra.amblor.service
 
-import android.content.Context
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSession
@@ -16,14 +15,13 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 
 @ExperimentalCoroutinesApi
-class SessionManager(private val context: Context) :
+class SessionManager(private val notificationRepository: NotificationRepository) :
     MediaSessionManager.OnActiveSessionsChangedListener {
     private val activeControllers =
         mutableMapOf<MediaSession.Token, Pair<MediaController, MediaCallback>>()
     private val playerPackages = listOf("com.google.android.apps.youtube.music")
 
     override fun onActiveSessionsChanged(controllers: MutableList<MediaController>?) {
-        val notificationRepository = NotificationRepository.getInstance(context)
         if (controllers?.isEmpty() != false) {
             notificationRepository.playingSong.value = NotificationSong.EmptySong
             return
@@ -33,7 +31,7 @@ class SessionManager(private val context: Context) :
             it.sessionToken !in activeControllers.keys &&
                 it.packageName in playerPackages
         }.forEach { controller ->
-            val callback = MediaCallback(context, controller)
+            val callback = MediaCallback(controller, notificationRepository)
             controller.registerCallback(callback)
             callback.onMetadataChanged(controller.metadata)
             callback.onPlaybackStateChanged(controller.playbackState)
@@ -49,10 +47,12 @@ class SessionManager(private val context: Context) :
 }
 
 @ExperimentalCoroutinesApi
-class MediaCallback(context: Context, private val controller: MediaController) :
+class MediaCallback(
+    private val controller: MediaController,
+    private val notificationRepository: NotificationRepository
+) :
     MediaController.Callback() {
 
-    private val notificationRepository = NotificationRepository.getInstance(context)
     // Increments id on dismiss so that the notification is re-shown when song is changed
     // private val broadcastReceiver = object : BroadcastReceiver() {
     //     override fun onReceive(p0: Context?, p1: Intent?) {

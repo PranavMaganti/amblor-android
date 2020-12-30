@@ -38,12 +38,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.compose.navigate
 import com.vanpra.amblor.AmbientNavHostController
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.BackButtonTitle
 import com.vanpra.amblor.util.ErrorOutlinedTextField
+import org.koin.androidx.compose.getViewModel
 import java.util.regex.Pattern
 
 class EmailSignupModel {
@@ -85,7 +85,7 @@ class EmailSignupModel {
 @Composable
 fun EmailSignup() {
     val focusManager = AmbientFocusManager.current
-    val authViewModel = viewModel<AuthViewModel>()
+    val authViewModel = getViewModel<AuthViewModel>()
     val authNavHost = AmbientNavHostController.current
 
     val signupModel = remember { EmailSignupModel() }

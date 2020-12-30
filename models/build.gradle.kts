@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    kotlin("plugin.serialization") version Libs.Kotlin.version
+    kotlin("plugin.serialization") version Dependencies.Kotlin.version
 }
 
 android {
@@ -26,10 +26,10 @@ android {
 }
 
 dependencies {
-    implementation(Libs.Kotlin.stdlib)
-    implementation(Libs.Kotlin.Serialization.core)
+    implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Kotlin.Serialization.core)
 
-    implementation(Libs.AndroidX.coreKtx)
-    implementation(Libs.AndroidX.appcompat)
-    implementation(Libs.material)
+    implementation(Dependencies.AndroidX.coreKtx)
+    implementation(Dependencies.AndroidX.appcompat)
+    implementation(Dependencies.material)
 }

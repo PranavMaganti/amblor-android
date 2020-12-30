@@ -1,7 +1,25 @@
-object Libs {
+object Dependencies {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha03"
     const val material = "com.google.android.material:material:1.3.0-beta01"
     const val googleServicesPlugin = "com.google.gms:google-services:4.3.4"
+
+    object Testing {
+        const val junit = "junit:junit:4.13.1"
+    }
+
+    object Mockk {
+        private const val version = "1.10.4"
+        const val unit = "io.mockk:mockk:$version"
+        const val android = "io.mockk:mockk-android:$version"
+    }
+
+    object Koin {
+        private const val version = "2.2.2"
+        const val core  ="org.koin:koin-android:$version"
+        const val compose = "org.koin:koin-androidx-compose:$version"
+        const val ext = "org.koin:koin-androidx-ext:$version"
+        const val test = "org.koin:koin-test:$version"
+    }
 
     object Accompanist {
         private const val version = "0.4.1"
@@ -63,6 +81,7 @@ object Libs {
             const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$version"
             const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha04"
             const val test = "androidx.compose.ui:ui-test:$version"
+            const val testJunit = "androidx.compose.ui:ui-test-junit4:$version"
         }
 
         object Room {
@@ -76,6 +95,11 @@ object Libs {
             private const val version = "2.3.0-rc01"
             const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
             const val viewmodel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
+        }
+
+        object Testing {
+            const val core = "androidx.test:core:1.3.1-alpha02"
+            const val ext = "androidx.test.ext:junit:1.1.3-alpha02"
         }
     }
 }

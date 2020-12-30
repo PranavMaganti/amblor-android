@@ -18,6 +18,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 const val CHANNEL_ID = "Amblor"
 const val NOTIFICATION_ID = 1000
@@ -27,6 +28,7 @@ class AmblorService : NotificationListenerService() {
     lateinit var notificationManager: NotificationManager
     lateinit var sessionManager: SessionManager
     private lateinit var mediaManager: MediaSessionManager
+    private val notificationRepository by inject<NotificationRepository>()
 
     override fun onCreate() {
         super.onCreate()
@@ -41,9 +43,8 @@ class AmblorService : NotificationListenerService() {
             .build()
         startForeground(NOTIFICATION_ID, waitingNotification)
 
-        val repository = NotificationRepository.getInstance(this)
         GlobalScope.launch {
-            repository.playingSong.collect {
+            notificationRepository.playingSong.collect {
                 val songNotification = if (it == NotificationSong.EmptySong) {
                     waitingNotification
                 } else {
@@ -61,7 +62,7 @@ class AmblorService : NotificationListenerService() {
     override fun onListenerConnected() {
         mediaManager =
             this.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
-        sessionManager = SessionManager(this)
+        sessionManager = SessionManager(notificationRepository)
         mediaManager.addOnActiveSessionsChangedListener(
             sessionManager,
             ComponentName(this, this::class.java)

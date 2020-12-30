@@ -5,33 +5,32 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.vanpra.amblor.Screen
+import com.vanpra.amblor.auth.AuthenticationApi
+import com.vanpra.amblor.auth.EmailAlreadyRegistered
+import com.vanpra.amblor.auth.InvalidPassword
 import com.vanpra.amblor.repositories.AmblorApiRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+class AuthViewModel(
+    application: Application,
+    private val apiRepo: AmblorApiRepository,
+    private val auth: AuthenticationApi
+) :
+    AndroidViewModel(application) {
     fun signupWithEmail(
         signupModel: EmailSignupModel,
         navHostController: NavHostController
     ) = viewModelScope.launch {
         try {
-            val auth = Firebase.auth
-                .createUserWithEmailAndPassword(signupModel.email.text, signupModel.password.text)
-                .await()
-            val idToken = auth.user!!.getIdToken(true).await().token!!
-            if (AmblorApiRepository.signupEmailUser(signupModel, idToken)) {
+            auth.createUserWithEmail(signupModel.email.text, signupModel.password.text)
+            if (apiRepo.signupEmailUser(signupModel, auth.getToken()!!)) {
                 navHostController.navigate(Screen.App.route)
             } else {
-                Firebase.auth.currentUser!!.delete().await()
+                auth.deleteCurrentUser()
             }
-        } catch (e: FirebaseAuthUserCollisionException) {
+        } catch (e: EmailAlreadyRegistered) {
             signupModel.email.showError("Email already used")
-        } catch (e: Exception) {
-            println(e)
         }
     }
 
@@ -40,24 +39,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         navHostController: NavHostController
     ) = viewModelScope.launch {
         println(loginModel)
-        val signInMethods =
-            Firebase.auth.fetchSignInMethodsForEmail(loginModel.email.text)
-                .await().signInMethods!!
+        val signInMethods = auth.fetchSignInMethodsForEmail(loginModel.email.text)
 
         if (signInMethods.isEmpty()) {
             loginModel.email.showError("Email not registered")
         } else if (!signInMethods.contains("password")) {
             loginModel.email.showError("Email registered with Google")
         } else {
-            Firebase.auth.signInWithEmailAndPassword(
-                loginModel.email.text,
-                loginModel.password.text
-            ).addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    loginModel.password.showError("Invalid Password")
-                } else {
-                    navHostController.navigate(Screen.App.route)
-                }
+            try {
+                auth.signInWithEmailAndPassword(loginModel.email.text, loginModel.password.text)
+                navHostController.navigate(Screen.App.route)
+            } catch (e: InvalidPassword) {
+                loginModel.password.showError("Invalid Password")
             }
         }
     }

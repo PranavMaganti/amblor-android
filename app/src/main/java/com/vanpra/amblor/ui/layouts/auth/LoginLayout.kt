@@ -1,11 +1,6 @@
 package com.vanpra.amblor.ui.layouts.auth
 
-import android.app.Activity
-import android.content.Intent
 import android.util.Patterns
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,17 +32,20 @@ import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.compose.navigate
 import com.vanpra.amblor.AmbientNavHostController
+import com.vanpra.amblor.MainActivity
 import com.vanpra.amblor.MainViewModel
 import com.vanpra.amblor.R
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.ErrorOutlinedTextField
+import org.koin.androidx.compose.getViewModel
 
 class TextInputState {
     val label: String
@@ -104,15 +102,7 @@ data class LoginModel(
 @Composable
 fun LoginLayout() {
     val login = remember { LoginModel() }
-    val activity = AmbientContext.current as AppCompatActivity
     val focusManager = AmbientFocusManager.current
-
-    val loginResult = activity.registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (it.resultCode == Activity.RESULT_OK) {
-        }
-    }
 
     Box(
         Modifier.fillMaxSize()
@@ -129,7 +119,7 @@ fun LoginLayout() {
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
                 )
                 LoginInputLayout(login)
-                LoginButtonLayout(login, loginResult)
+                LoginButtonLayout(login)
             }
         }
     }
@@ -139,6 +129,7 @@ fun LoginLayout() {
 fun LoginInputLayout(loginModel: LoginModel) {
     ErrorOutlinedTextField(
         loginModel.email,
+        modifier = Modifier.semantics { contentDescription = "Email" },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         nextInput = loginModel.password
     )
@@ -147,6 +138,7 @@ fun LoginInputLayout(loginModel: LoginModel) {
 
     ErrorOutlinedTextField(
         loginModel.password,
+        modifier = Modifier.semantics { contentDescription = "Password" },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
@@ -158,13 +150,11 @@ fun LoginInputLayout(loginModel: LoginModel) {
 }
 
 @Composable
-fun LoginButtonLayout(
-    loginModel: LoginModel,
-    loginResult: ActivityResultLauncher<Intent>
-) {
-    val authViewModel = viewModel<AuthViewModel>()
-    val mainViewModel = viewModel<MainViewModel>()
+fun LoginButtonLayout(loginModel: LoginModel) {
+    val authViewModel = getViewModel<AuthViewModel>()
+    val mainViewModel = getViewModel<MainViewModel>()
     val authNavController = AmbientNavHostController.current
+    val mainActivity = AmbientContext.current as MainActivity
 
     Button(
         onClick = {
@@ -194,7 +184,7 @@ fun LoginButtonLayout(
 
     Button(
         onClick = {
-            loginResult.launch(mainViewModel.client.signInIntent)
+            mainActivity.googleSignInRes.launch(mainViewModel.client.signInIntent)
         },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)

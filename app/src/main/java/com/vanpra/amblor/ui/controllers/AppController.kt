@@ -5,16 +5,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ConstraintLayout
-import androidx.compose.foundation.layout.Dimension
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -50,7 +48,11 @@ fun AppController() {
     Box {
         val mainNavController = AmbientNavHostController.current
         val bottomNavController = rememberNavController()
-        AmblorScaffold(bottomNavController) {
+
+        Scaffold(
+            topBar = { AmblorTitle() },
+            bottomBar = { AmblorNavigation(bottomNavController) }
+        ) {
             NavHost(
                 navController = bottomNavController,
                 startDestination = Screen.Scrobbles.route
@@ -60,40 +62,6 @@ fun AppController() {
                 composable(Screen.Profile.route) { ProfileLayout(mainNavController) }
             }
         }
-    }
-}
-
-@Composable
-fun AmblorScaffold(bottomNavController: NavHostController, children: @Composable () -> Unit) {
-    ConstraintLayout(Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
-        val (title, body, bottomNav) = createRefs()
-        AmblorTitle(
-            Modifier.constrainAs(title) {
-                top.linkTo(parent.top)
-                centerHorizontallyTo(parent)
-                width = Dimension.fillToConstraints
-            }
-        )
-
-        Box(
-            Modifier.constrainAs(body) {
-                linkTo(top = title.bottom, bottom = bottomNav.top)
-                linkTo(start = parent.start, end = parent.end)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            }
-        ) {
-            children()
-        }
-
-        AmblorNavigation(
-            Modifier.constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                linkTo(parent.start, parent.end)
-                width = Dimension.fillToConstraints
-            },
-            bottomNavController
-        )
     }
 }
 
@@ -116,7 +84,7 @@ fun AmblorTitle(modifier: Modifier = Modifier) {
 data class NavigationItem(val name: String, val icon: ImageVector, val state: Screen)
 
 @Composable
-fun AmblorNavigation(modifier: Modifier = Modifier, bottomNavController: NavHostController) {
+fun AmblorNavigation(bottomNavController: NavHostController, modifier: Modifier = Modifier) {
     var selectedIndex by savedInstanceState { 0 }
 
     val items = remember {

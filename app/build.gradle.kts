@@ -71,8 +71,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Libs.AndroidX.Compose.version
-        kotlinCompilerVersion = Libs.Kotlin.version
+        kotlinCompilerExtensionVersion = Dependencies.AndroidX.Compose.version
+        kotlinCompilerVersion = Dependencies.Kotlin.version
     }
 
 }
@@ -93,52 +93,60 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 dependencies {
     //Temporary until serialization with Compose is fixed
     implementation(project(":models"))
-    implementation(Libs.Kotlin.stdlib)
-    implementation(Libs.Kotlin.datetime)
+    implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Kotlin.datetime)
 
-    implementation(Libs.Coroutines.core)
-    implementation(Libs.Coroutines.android)
-    implementation(Libs.Coroutines.test)
+    implementation(Dependencies.Coroutines.core)
+    implementation(Dependencies.Coroutines.android)
+    implementation(Dependencies.Coroutines.test)
 
-    implementation(Libs.Firebase.analytics)
-    implementation(Libs.Firebase.authKtx)
+    implementation(Dependencies.Firebase.analytics)
+    implementation(Dependencies.Firebase.authKtx)
 
-    implementation(Libs.PlayServices.auth)
-    implementation(Libs.PlayServices.coroutines)
+    implementation(Dependencies.PlayServices.auth)
+    implementation(Dependencies.PlayServices.coroutines)
 
-    implementation(Libs.AndroidX.Compose.ui)
-    implementation(Libs.AndroidX.Compose.foundation)
-    implementation(Libs.AndroidX.Compose.foundationLayout)
-    implementation(Libs.AndroidX.Compose.material)
-    implementation(Libs.AndroidX.Compose.tooling)
-    implementation(Libs.AndroidX.Compose.materialIconsExtended)
-    implementation(Libs.AndroidX.Compose.navigation)
-    androidTestImplementation(Libs.AndroidX.Compose.test)
+    implementation(Dependencies.AndroidX.Compose.ui)
+    implementation(Dependencies.AndroidX.Compose.foundation)
+    implementation(Dependencies.AndroidX.Compose.foundationLayout)
+    implementation(Dependencies.AndroidX.Compose.material)
+    implementation(Dependencies.AndroidX.Compose.tooling)
+    implementation(Dependencies.AndroidX.Compose.materialIconsExtended)
+    implementation(Dependencies.AndroidX.Compose.navigation)
 
-    implementation(Libs.AndroidX.coreKtx)
-    implementation(Libs.AndroidX.preference)
-    implementation(Libs.AndroidX.appcompat)
+    implementation(Dependencies.AndroidX.coreKtx)
+    implementation(Dependencies.AndroidX.preference)
+    implementation(Dependencies.AndroidX.appcompat)
 
-    implementation(Libs.AndroidX.Lifecycle.runtime)
-    implementation(Libs.AndroidX.Lifecycle.viewmodel)
+    implementation(Dependencies.AndroidX.Lifecycle.runtime)
+    implementation(Dependencies.AndroidX.Lifecycle.viewmodel)
 
-    implementation(Libs.material)
+    implementation(Dependencies.material)
 
-    implementation(Libs.Accompanist.coil)
-    implementation(Libs.Accompanist.insets)
+    implementation(Dependencies.Accompanist.coil)
+    implementation(Dependencies.Accompanist.insets)
 
-    implementation(Libs.AndroidX.Room.runtime)
-    implementation(Libs.AndroidX.Room.ktx)
-    kapt(Libs.AndroidX.Room.compiler)
+    implementation(Dependencies.AndroidX.Room.runtime)
+    implementation(Dependencies.AndroidX.Room.ktx)
+    kapt(Dependencies.AndroidX.Room.compiler)
 
-    implementation(Libs.Ktor.cio)
-    implementation(Libs.Ktor.json)
-    implementation(Libs.Ktor.android)
-    implementation(Libs.Ktor.serialization)
+    implementation(Dependencies.Ktor.cio)
+    implementation(Dependencies.Ktor.json)
+    implementation(Dependencies.Ktor.android)
+    implementation(Dependencies.Ktor.serialization)
 
-    testImplementation("junit:junit:4.13.1")
-    testImplementation("org.mockito:mockito-core:3.6.28")
-    testImplementation("androidx.test:core:1.3.1-alpha02")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3-alpha02")
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.compose)
+    implementation(Dependencies.Koin.ext)
+    implementation(Dependencies.Koin.test)
 
+    testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Mockk.unit)
+    testImplementation(Dependencies.AndroidX.Testing.core)
+
+    androidTestImplementation(Dependencies.AndroidX.Testing.ext)
+    androidTestImplementation(Dependencies.AndroidX.Compose.test)
+    androidTestImplementation(Dependencies.AndroidX.Compose.testJunit)
+    androidTestImplementation(Dependencies.AndroidX.Compose.ui)
+    androidTestImplementation(Dependencies.Mockk.android)
 }
