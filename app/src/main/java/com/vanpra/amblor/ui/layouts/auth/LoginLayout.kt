@@ -168,7 +168,7 @@ fun LoginButtonLayout(authViewModel: AuthViewModel) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("signup_btn")
             .background(MaterialTheme.colors.primaryVariant)
     ) {
-        Text("Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally),)
+        Text("Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
     }
 
     Button(
