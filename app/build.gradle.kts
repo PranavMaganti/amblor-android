@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
     kotlin("android")
+    id("kotlin-parcelize")
     id("kotlin-kapt")
     id("org.jmailen.kotlinter") version "3.2.0"
 }
@@ -17,7 +18,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.vanpra.amblor.ComposeInstrumentTestRunner"
 
         buildConfigField(
             "String",
@@ -149,4 +151,5 @@ dependencies {
     androidTestImplementation(Dependencies.AndroidX.Compose.testJunit)
     androidTestImplementation(Dependencies.AndroidX.Compose.ui)
     androidTestImplementation(Dependencies.Mockk.android)
+    androidTestImplementation(Dependencies.AndroidX.Testing.runner)
 }

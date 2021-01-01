@@ -21,7 +21,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,23 +28,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.vanpra.amblor.AmbientNavHostController
-import com.vanpra.amblor.MainActivity
-import com.vanpra.amblor.MainViewModel
 import com.vanpra.amblor.R
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.ErrorOutlinedTextField
-import org.koin.androidx.compose.getViewModel
 
 class TextInputState {
     val label: String
@@ -89,7 +83,7 @@ class TextInputState {
     }
 }
 
-data class LoginModel(
+data class LoginState(
     val email: TextInputState = TextInputState("Email"),
     val password: TextInputState = TextInputState("Password")
 ) {
@@ -100,8 +94,7 @@ data class LoginModel(
 }
 
 @Composable
-fun LoginLayout() {
-    val login = remember { LoginModel() }
+fun LoginLayout(authViewModel: AuthViewModel) {
     val focusManager = AmbientFocusManager.current
 
     Box(
@@ -118,27 +111,27 @@ fun LoginLayout() {
                         .fillMaxWidth(),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
                 )
-                LoginInputLayout(login)
-                LoginButtonLayout(login)
+                LoginInputLayout(authViewModel)
+                LoginButtonLayout(authViewModel)
             }
         }
     }
 }
 
 @Composable
-fun LoginInputLayout(loginModel: LoginModel) {
+fun LoginInputLayout(authViewModel: AuthViewModel) {
     ErrorOutlinedTextField(
-        loginModel.email,
-        modifier = Modifier.semantics { contentDescription = "Email" },
+        authViewModel.loginState.email,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        nextInput = loginModel.password
+        nextInput = authViewModel.loginState.password,
+        testTag = "login_email_input"
     )
 
     Spacer(modifier = Modifier.height(8.dp))
 
     ErrorOutlinedTextField(
-        loginModel.password,
-        modifier = Modifier.semantics { contentDescription = "Password" },
+        authViewModel.loginState.password,
+        testTag = "login_password_input",
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
@@ -150,48 +143,43 @@ fun LoginInputLayout(loginModel: LoginModel) {
 }
 
 @Composable
-fun LoginButtonLayout(loginModel: LoginModel) {
-    val authViewModel = getViewModel<AuthViewModel>()
-    val mainViewModel = getViewModel<MainViewModel>()
+fun LoginButtonLayout(authViewModel: AuthViewModel) {
     val authNavController = AmbientNavHostController.current
-    val mainActivity = AmbientContext.current as MainActivity
+
+    // val googleSignInRes = activity.registerForActivityResult(
+    //     ActivityResultContracts.StartActivityForResult()
+    // ) {
+    //     if (it.resultCode == Activity.RESULT_OK) {
+    //     }
+    // }
 
     Button(
-        onClick = {
-            authViewModel.signInWithEmail(loginModel, authNavController)
-        },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        enabled = loginModel.isValid()
+        onClick = { authViewModel.signInWithEmail(authNavController) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("login_submit_btn"),
+        enabled = authViewModel.loginState.isValid()
     ) {
-        Text(
-            "Sign in",
-            Modifier.wrapContentWidth(Alignment.CenterHorizontally),
-        )
+        Text("Sign in", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
     }
 
     Button(
         onClick = {
             authNavController.navigate(route = Screen.EmailSignUp.route)
         },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("signup_btn")
             .background(MaterialTheme.colors.primaryVariant)
     ) {
-        Text(
-            "Sign up",
-            Modifier.wrapContentWidth(Alignment.CenterHorizontally),
-        )
+        Text("Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally),)
     }
 
     Button(
         onClick = {
-            mainActivity.googleSignInRes.launch(mainViewModel.client.signInIntent)
+            // googleSignInRes.launch(authViewModel.client.signInIntent)
         },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
     ) {
         Image(
-            vectorResource(R.drawable.ic_google_icon),
-            modifier = Modifier.height(20.dp).padding(end = 16.dp)
+            vectorResource(R.drawable.ic_google_icon), Modifier.height(20.dp).padding(end = 16.dp)
         )
         Text("Sign in with Google", color = Color.DarkGray)
     }

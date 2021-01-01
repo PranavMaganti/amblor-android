@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,19 +38,24 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.vanpra.amblor.AmbientNavHostController
+import com.vanpra.amblor.MainViewModel
 import com.vanpra.amblor.Screen
+import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
+import org.koin.androidx.compose.getViewModel
 
 @ExperimentalAnimationApi
 @Composable
-fun AppController() {
+fun AppController(authViewModel: AuthViewModel) {
     Box {
         val mainNavController = AmbientNavHostController.current
         val bottomNavController = rememberNavController()
+        val mainViewModel = getViewModel<MainViewModel>()
 
         Scaffold(
+            modifier = Modifier.testTag("app_scaffold"),
             topBar = { AmblorTitle() },
             bottomBar = { AmblorNavigation(bottomNavController) }
         ) {
@@ -59,7 +65,7 @@ fun AppController() {
             ) {
                 composable(Screen.Scrobbles.route) { ScrobbleLayout() }
                 composable(Screen.Stats.route) { StatsLayout() }
-                composable(Screen.Profile.route) { ProfileLayout(mainNavController) }
+                composable(Screen.Profile.route) { ProfileLayout(mainNavController, authViewModel) }
             }
         }
     }

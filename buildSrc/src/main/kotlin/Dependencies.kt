@@ -98,7 +98,9 @@ object Dependencies {
         }
 
         object Testing {
-            const val core = "androidx.test:core:1.3.1-alpha02"
+            private const val version = "1.3.1-alpha02"
+            const val core = "androidx.test:core:$version"
+            const val runner = "androidx.test:runner:$version"
             const val ext = "androidx.test.ext:junit:1.1.3-alpha02"
         }
     }

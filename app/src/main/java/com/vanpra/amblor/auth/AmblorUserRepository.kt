@@ -1,4 +1,4 @@
-package com.vanpra.amblor.repositories
+package com.vanpra.amblor.auth
 
 import com.vanpra.amblor.models.NewUser
 import com.vanpra.amblor.ui.layouts.auth.EmailSignupModel
@@ -12,7 +12,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 
-class AmblorApiRepository {
+class AmblorUserRepository: AmblorUserApi {
     private val baseUrl = "http://192.168.0.29:8080"
 
     private val client by lazy {
@@ -25,7 +25,7 @@ class AmblorApiRepository {
         }
     }
 
-    suspend fun signupEmailUser(signupModel: EmailSignupModel, idToken: String): Boolean {
+    override suspend fun signupEmailUser(signupModel: EmailSignupModel, idToken: String): Boolean {
         val res = client.post<HttpResponse> {
             url {
                 takeFrom(baseUrl)

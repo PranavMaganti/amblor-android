@@ -1,6 +1,8 @@
 package com.vanpra.amblor.repositories
 
 import android.media.session.PlaybackState
+import com.vanpra.amblor.auth.AmblorUserApi
+import com.vanpra.amblor.auth.AmblorUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
 data class NotificationSong(
@@ -16,7 +18,7 @@ data class NotificationSong(
     }
 }
 
-class NotificationRepository(amblorApi: AmblorApiRepository) {
+class NotificationRepository(amblorApi: AmblorUserApi) {
     val playingSong = MutableStateFlow(NotificationSong.EmptySong)
     // val scrobbleDao = AmblorDatabase.getDatabase(context.applicationContext).scrobbleDao()
 }

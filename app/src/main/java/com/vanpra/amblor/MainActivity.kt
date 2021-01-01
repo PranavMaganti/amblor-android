@@ -1,11 +1,8 @@
 package com.vanpra.amblor
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -25,12 +22,15 @@ import androidx.navigation.compose.rememberNavController
 import com.vanpra.amblor.auth.AuthenticationApi
 import com.vanpra.amblor.service.AmblorService
 import com.vanpra.amblor.ui.controllers.AppController
+import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.auth.EmailSignup
 import com.vanpra.amblor.ui.layouts.auth.GoogleSignup
 import com.vanpra.amblor.ui.layouts.auth.LoginLayout
 import com.vanpra.amblor.ui.theme.AmblorTheme
+import com.vanpra.amblor.util.LoadingScreen
 import dev.chrisbanes.accompanist.insets.systemBarsPadding
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.getViewModel
 
 sealed class Screen(val route: String) {
     object App : Screen("App")
@@ -40,27 +40,19 @@ sealed class Screen(val route: String) {
     object Login : Screen("Login")
     object GoogleSignUp : Screen("GoogleSignUp")
     object EmailSignUp : Screen("EmailSignUp")
+    object Loading : Screen("Loading")
 }
 
 val AmbientNavHostController = staticAmbientOf<NavHostController>()
 
 class MainActivity : AppCompatActivity() {
-    lateinit var googleSignInRes: ActivityResultLauncher<Intent>
-
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        googleSignInRes = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (it.resultCode == Activity.RESULT_OK) {
-            }
-        }
-
         val auth by inject<AuthenticationApi>()
-        val startScreen = if (auth.isUserSignedIn()) { Screen.App } else Screen.Login
+        val startScreen = if (auth.isUserSignedIn()) Screen.App else Screen.Login
 
         setContent { MainLayout(startScreen) }
     }
@@ -83,19 +75,21 @@ class MainActivity : AppCompatActivity() {
 fun MainLayout(startScreen: Screen = Screen.Login) {
     AmblorTheme {
         val mainNavController = rememberNavController()
+        val authViewModel = getViewModel<AuthViewModel>()
+
         Box(
-            Modifier.fillMaxSize().background(MaterialTheme.colors.background)
-                .systemBarsPadding()
+            Modifier.fillMaxSize().background(MaterialTheme.colors.background).systemBarsPadding()
         ) {
             Providers(AmbientNavHostController provides mainNavController) {
                 NavHost(
                     navController = mainNavController,
                     startDestination = startScreen.route
                 ) {
-                    composable(Screen.App.route) { AppController() }
-                    composable(Screen.Login.route) { LoginLayout() }
+                    composable(Screen.App.route) { AppController(authViewModel) }
+                    composable(Screen.Login.route) { LoginLayout(authViewModel) }
                     composable(Screen.GoogleSignUp.route) { GoogleSignup() }
                     composable(Screen.EmailSignUp.route) { EmailSignup() }
+                    composable(Screen.Loading.route) { LoadingScreen() }
                 }
             }
         }

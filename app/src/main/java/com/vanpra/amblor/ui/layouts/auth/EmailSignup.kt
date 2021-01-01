@@ -88,7 +88,6 @@ fun EmailSignup() {
     val authViewModel = getViewModel<AuthViewModel>()
     val authNavHost = AmbientNavHostController.current
 
-    val signupModel = remember { EmailSignupModel() }
     var showingPasswordList by remember { mutableStateOf(false) }
 
     Column(
@@ -100,29 +99,29 @@ fun EmailSignup() {
 
         Column(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorOutlinedTextField(
-                inputState = signupModel.email,
+                inputState = authViewModel.signupState.email,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Email
                 ),
-                nextInput = signupModel.username
+                nextInput = authViewModel.signupState.username
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ErrorOutlinedTextField(
-                inputState = signupModel.username,
+                inputState = authViewModel.signupState.username,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text
                 ),
-                nextInput = signupModel.password
+                nextInput = authViewModel.signupState.password
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ErrorOutlinedTextField(
-                inputState = signupModel.password,
+                inputState = authViewModel.signupState.password,
                 modifier = Modifier.onFocusChanged {
                     showingPasswordList = it.isFocused
                 },
@@ -131,19 +130,19 @@ fun EmailSignup() {
                     keyboardType = KeyboardType.Password
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                nextInput = signupModel.confirmPassword,
+                nextInput = authViewModel.signupState.confirmPassword,
                 showErrorText = false
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             PasswordCriteria(
-                signUpModel = signupModel,
+                signUpModel = authViewModel.signupState,
                 showing = showingPasswordList
             )
 
             ErrorOutlinedTextField(
-                inputState = signupModel.confirmPassword,
+                inputState = authViewModel.signupState.confirmPassword,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
@@ -155,10 +154,10 @@ fun EmailSignup() {
 
             Button(
                 onClick = {
-                    authViewModel.signupWithEmail(signupModel, authNavHost)
+                    authViewModel.signupWithEmail(authNavHost)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = signupModel.detailsValid()
+                enabled = authViewModel.signupState.detailsValid()
             ) {
                 Text("Complete Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
             }
