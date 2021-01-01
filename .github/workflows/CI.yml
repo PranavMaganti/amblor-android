@@ -17,7 +17,8 @@ jobs:
       - run: |
           echo "${{ secrets.SECRET_PROPERTIES }}" > secret.properties.asc
           gpg -d --passphrase "${{ secrets.SECRET_PROPERTIES_PASSPHRASE }}" --batch secret.properties.asc > secret.properties
-
+          echo "${{ secrets.GOOGLE_SERVICES }}" > google-services.json.asc
+          gpg -d --passphrase "${{ secrets.GOOGLE_SERVICES_PASSPHRASE }}" --batch google-services.json.asc > app/google-services.json
       - uses: gradle/wrapper-validation-action@v1
       - uses: actions/setup-java@v1
         with:
