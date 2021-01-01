@@ -40,14 +40,14 @@ android {
 
     signingConfigs {
         getByName("debug") {
-            storeFile = file(secretsProperties["debug_keystore"] as String)
+            storeFile = rootProject.file(secretsProperties["debug_keystore"] as String)
             keyAlias = "androiddebugkey"
             storePassword = "android"
             keyPassword = "android"
         }
 
         create("release") {
-            storeFile = file(secretsProperties["release_keystore"] as String)
+            storeFile = rootProject.file(secretsProperties["release_keystore"] as String)
             storePassword = secretsProperties["release_keystore_password"] as String
             keyPassword = secretsProperties["release_key_password"] as String
             keyAlias = "release"
