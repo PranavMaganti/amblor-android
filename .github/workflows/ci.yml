@@ -6,7 +6,7 @@ on:
   pull_request:
 jobs:
   instrumentation-tests:
-    name: Instrumentation Testing
+    name: Instrumentation tests
     runs-on: macos-latest
     strategy:
       fail-fast: true
@@ -33,5 +33,5 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
-          profile: Pixel 4 XL
+          profile: Nexus 6P
           script: ./gradlew connectedCheck
