@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import kotlin.jvm.Throws
 
 class FirebaseAuthRepository : AuthenticationApi {
     override suspend fun createUserWithEmail(username: String, password: String) {

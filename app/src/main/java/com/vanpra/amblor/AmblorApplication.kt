@@ -3,10 +3,10 @@ package com.vanpra.amblor
 import android.app.Application
 import androidx.room.Room
 import com.vanpra.amblor.auth.AmblorUserApi
+import com.vanpra.amblor.auth.AmblorUserRepository
 import com.vanpra.amblor.auth.AuthenticationApi
 import com.vanpra.amblor.auth.FirebaseAuthRepository
 import com.vanpra.amblor.data.AmblorDatabase
-import com.vanpra.amblor.auth.AmblorUserRepository
 import com.vanpra.amblor.repositories.NotificationRepository
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import org.koin.android.ext.koin.androidApplication

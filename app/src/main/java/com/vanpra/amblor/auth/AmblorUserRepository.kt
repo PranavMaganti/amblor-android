@@ -12,7 +12,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 
-class AmblorUserRepository: AmblorUserApi {
+class AmblorUserRepository : AmblorUserApi {
     private val baseUrl = "http://192.168.0.29:8080"
 
     private val client by lazy {

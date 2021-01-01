@@ -38,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.vanpra.amblor.AmbientNavHostController
+import com.vanpra.amblor.BuildConfig
 import com.vanpra.amblor.MainViewModel
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel

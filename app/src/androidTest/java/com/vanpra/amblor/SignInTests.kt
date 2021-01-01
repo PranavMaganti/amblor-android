@@ -36,9 +36,11 @@ class SignInTests : KoinTest {
     @Before
     fun startKoinBeforeTest() {
         authApi = mockk()
-        loadKoinModules(module {
-            single(override = true) { authApi }
-        })
+        loadKoinModules(
+            module {
+                single(override = true) { authApi }
+            }
+        )
     }
 
     @ExperimentalAnimationApi

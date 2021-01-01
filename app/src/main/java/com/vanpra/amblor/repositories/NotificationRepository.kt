@@ -2,7 +2,6 @@ package com.vanpra.amblor.repositories
 
 import android.media.session.PlaybackState
 import com.vanpra.amblor.auth.AmblorUserApi
-import com.vanpra.amblor.auth.AmblorUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
 data class NotificationSong(

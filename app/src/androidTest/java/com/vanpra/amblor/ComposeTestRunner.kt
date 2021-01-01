@@ -5,9 +5,11 @@ import android.app.Instrumentation
 import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
 
-class ComposeInstrumentTestRunner: AndroidJUnitRunner() {
+class ComposeInstrumentTestRunner : AndroidJUnitRunner() {
     override fun newApplication(
-        cl: ClassLoader?, className: String?, context: Context?
+        cl: ClassLoader?,
+        className: String?,
+        context: Context?
     ): Application {
         return Instrumentation.newApplication(AmblorApplication::class.java, context)
     }

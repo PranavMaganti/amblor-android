@@ -1,3 +1,7 @@
+import java.util.Properties
+import java.io.InputStreamReader
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -5,6 +9,12 @@ plugins {
     id("kotlin-parcelize")
     id("kotlin-kapt")
     id("org.jmailen.kotlinter") version "3.2.0"
+}
+
+val secretsProperties = Properties()
+val propertiesFile = rootProject.file("./secret.properties")
+InputStreamReader(FileInputStream(propertiesFile), Charsets.UTF_8).use { reader ->
+    secretsProperties.load(reader)
 }
 
 android {
@@ -24,22 +34,22 @@ android {
         buildConfigField(
             "String",
             "REQUEST_ID_TOKEN",
-            project.properties["request_id_token"] as String
+            secretsProperties["request_id_token"] as String
         )
     }
 
     signingConfigs {
         getByName("debug") {
-            storeFile = file(rootProject.extra["debug_keystore"] as String)
+            storeFile = file(secretsProperties["debug_keystore"] as String)
             keyAlias = "androiddebugkey"
             storePassword = "android"
             keyPassword = "android"
         }
 
         create("release") {
-            storeFile = file(rootProject.extra["release_keystore"] as String)
-            storePassword = rootProject.extra["release_keystore_password"] as String
-            keyPassword = rootProject.extra["release_key_password"] as String
+            storeFile = file(secretsProperties["release_keystore"] as String)
+            storePassword = secretsProperties["release_keystore_password"] as String
+            keyPassword = secretsProperties["release_key_password"] as String
             keyAlias = "release"
         }
     }
