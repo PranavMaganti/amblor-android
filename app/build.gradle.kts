@@ -6,7 +6,6 @@ plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
     kotlin("android")
-    id("kotlin-parcelize")
     id("kotlin-kapt")
     id("org.jmailen.kotlinter") version "3.2.0"
 }
@@ -29,6 +28,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "com.vanpra.amblor.ComposeInstrumentTestRunner"
+        // testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
             "String",
@@ -96,7 +96,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
             "-Xskip-prerelease-check",
             "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xopt-in=kotlinx.coroutines.FlowPreview",
-            "-Xopt-in=kotlin.Experimental"
+            "-Xopt-in=kotlin.Experimental",
+            "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"
         )
     }
 }

@@ -2,7 +2,6 @@ package com.vanpra.amblor.ui.layouts.auth
 
 import android.util.Patterns
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
@@ -81,7 +80,6 @@ class EmailSignupModel {
         username.isValid() && email.isValid() && password.isValid() && confirmPassword.isValid()
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun EmailSignup() {
     val focusManager = AmbientFocusManager.current
@@ -165,7 +163,6 @@ fun EmailSignup() {
     }
 }
 
-@ExperimentalAnimationApi
 @Composable
 private fun PasswordCriteria(
     signUpModel: EmailSignupModel,

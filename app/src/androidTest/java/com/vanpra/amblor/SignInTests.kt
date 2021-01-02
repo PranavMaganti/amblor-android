@@ -1,12 +1,9 @@
 package com.vanpra.amblor
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vanpra.amblor.auth.AuthenticationApi
 import com.vanpra.amblor.auth.InvalidPasswordException
@@ -22,39 +19,31 @@ import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 
+data class User(val email: String, val password: String, val username: String) {
+    companion object {
+        val testUser = User("testemail@emailservice.com", "password", "test")
+    }
+}
+
 @RunWith(AndroidJUnit4::class)
 class SignInTests : KoinTest {
-    private data class User(val email: String, val password: String, val username: String)
-
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createComposeRule()
 
-    private val testUser = User("testemail@emailservice.com", "password", "test")
-
+    private val testUser = User.testUser
     private lateinit var authApi: AuthenticationApi
 
     @Before
-    fun startKoinBeforeTest() {
-        authApi = mockk()
-        loadKoinModules(
-            module {
-                single(override = true) { authApi }
-            }
-        )
+    fun setupMockDependencies() {
+        authApi = mockk {
+            /* Need this as MainActivity onCreate calls this */
+            every { isUserSignedIn() } returns false
+        }
+
+        val mockModules = module(override = true) { single { authApi } }
+        loadKoinModules(mockModules)
     }
 
-    @ExperimentalAnimationApi
-    fun setupLayoutAndLogin() {
-        /* Need this as MainActivity onCreate calls this */
-        every { authApi.isUserSignedIn() } returns false
-
-        composeTestRule.setContent { MainLayout() }
-        composeTestRule.onNodeWithTag("login_email_input").performTextInput(testUser.email)
-        composeTestRule.onNodeWithTag("login_password_input").performTextInput(testUser.password)
-        composeTestRule.onNodeWithTag("login_submit_btn").performClick()
-    }
-
-    @ExperimentalAnimationApi
     @Test
     fun checkEmailSignInWhenRegistered() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf("password")
@@ -65,7 +54,8 @@ class SignInTests : KoinTest {
             )
         } returns Unit
 
-        setupLayoutAndLogin()
+        composeTestRule.launchAmblorApp()
+        composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("app_scaffold").assertIsDisplayed()
 
         coVerify(exactly = 1) { authApi.fetchSignInMethodsForEmail(testUser.email) }
@@ -74,7 +64,6 @@ class SignInTests : KoinTest {
         }
     }
 
-    @ExperimentalAnimationApi
     @Test
     fun checkEmailSignInWhenMultipleProviders() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf(
@@ -88,7 +77,8 @@ class SignInTests : KoinTest {
             )
         } returns Unit
 
-        setupLayoutAndLogin()
+        composeTestRule.launchAmblorApp()
+        composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("app_scaffold").assertIsDisplayed()
 
         coVerify(exactly = 1) { authApi.fetchSignInMethodsForEmail(testUser.email) }
@@ -97,31 +87,30 @@ class SignInTests : KoinTest {
         }
     }
 
-    @ExperimentalAnimationApi
     @Test
     fun checkEmailErrorWhenNotRegistered() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf()
 
-        setupLayoutAndLogin()
+        composeTestRule.launchAmblorApp()
+        composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_email_input_error", true).assertIsDisplayed()
             .assertTextEquals("Email not registered")
 
         coVerify(exactly = 1) { authApi.fetchSignInMethodsForEmail(testUser.email) }
     }
 
-    @ExperimentalAnimationApi
     @Test
     fun checkEmailErrorWhenRegWithDifferentProvider() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf("Google")
 
-        setupLayoutAndLogin()
+        composeTestRule.launchAmblorApp()
+        composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_email_input_error", true).assertIsDisplayed()
             .assertTextEquals("Email registered with different provider")
 
         coVerify(exactly = 1) { authApi.fetchSignInMethodsForEmail(testUser.email) }
     }
 
-    @ExperimentalAnimationApi
     @Test
     fun checkPasswordErrorWhenInvalidPassword() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf("password")
@@ -132,7 +121,8 @@ class SignInTests : KoinTest {
             )
         } throws InvalidPasswordException("Invalid password given")
 
-        setupLayoutAndLogin()
+        composeTestRule.launchAmblorApp()
+        composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_password_input_error", true).assertIsDisplayed()
             .assertTextEquals("Invalid Password")
 

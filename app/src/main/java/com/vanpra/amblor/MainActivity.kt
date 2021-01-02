@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +45,6 @@ sealed class Screen(val route: String) {
 val AmbientNavHostController = staticAmbientOf<NavHostController>()
 
 class MainActivity : AppCompatActivity() {
-    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -70,7 +68,6 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun MainLayout(startScreen: Screen = Screen.Login) {
     AmblorTheme {

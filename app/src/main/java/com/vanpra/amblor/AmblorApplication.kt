@@ -20,6 +20,8 @@ class AmblorApplication : Application() {
     companion object {
         val appModule = module {
             single<AmblorUserApi> { AmblorUserRepository() }
+            single<AuthenticationApi> { FirebaseAuthRepository() }
+
             single { NotificationRepository(get()) }
             single {
                 Room.databaseBuilder(
@@ -28,7 +30,6 @@ class AmblorApplication : Application() {
                     "scrobble_database"
                 ).build()
             }
-            single<AuthenticationApi> { FirebaseAuthRepository() }
 
             viewModel { AuthViewModel(androidApplication(), get(), get()) }
             viewModel { MainViewModel(androidApplication(), get()) }

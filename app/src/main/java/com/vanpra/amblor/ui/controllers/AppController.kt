@@ -1,6 +1,5 @@
 package com.vanpra.amblor.ui.controllers
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,6 @@ import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
 import org.koin.androidx.compose.getViewModel
 
-@ExperimentalAnimationApi
 @Composable
 fun AppController(authViewModel: AuthViewModel) {
     Box {
