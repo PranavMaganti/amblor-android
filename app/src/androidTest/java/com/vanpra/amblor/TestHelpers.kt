@@ -1,11 +1,12 @@
 package com.vanpra.amblor
 
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 
-fun ComposeTestRule.launchAmblorApp() {
+fun ComposeContentTestRule.launchAmblorApp() {
     setContent { MainLayout() }
 }
 
