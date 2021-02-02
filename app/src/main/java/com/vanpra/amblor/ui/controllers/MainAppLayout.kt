@@ -4,14 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ConstraintLayout
+import androidx.compose.foundation.layout.Dimension
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -36,23 +38,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
-import com.vanpra.amblor.AmbientNavHostController
-import com.vanpra.amblor.MainViewModel
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
+import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleViewModel
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun AppController(authViewModel: AuthViewModel) {
+fun MainAppLayout(authViewModel: AuthViewModel) {
     Box {
-        val mainNavController = AmbientNavHostController.current
         val bottomNavController = rememberNavController()
-        val mainViewModel = getViewModel<MainViewModel>()
+        val scrobbleViewModel = getViewModel<ScrobbleViewModel>()
 
-        Scaffold(
+        AmblorScaffold(
             modifier = Modifier.testTag("app_scaffold"),
             topBar = { AmblorTitle() },
             bottomBar = { AmblorNavigation(bottomNavController) }
@@ -61,10 +61,50 @@ fun AppController(authViewModel: AuthViewModel) {
                 navController = bottomNavController,
                 startDestination = Screen.Scrobbles.route
             ) {
-                composable(Screen.Scrobbles.route) { ScrobbleLayout() }
+                composable(Screen.Scrobbles.route) { ScrobbleLayout(scrobbleViewModel) }
                 composable(Screen.Stats.route) { StatsLayout() }
-                composable(Screen.Profile.route) { ProfileLayout(mainNavController, authViewModel) }
+                composable(Screen.Profile.route) { ProfileLayout(authViewModel) }
             }
+        }
+    }
+}
+
+@Composable
+fun AmblorScaffold(
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit,
+    bottomBar: @Composable () -> Unit,
+    children: @Composable () -> Unit
+) {
+    ConstraintLayout(modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
+        val (title, body, bottomNav) = createRefs()
+        Box(modifier =
+        Modifier.constrainAs(title) {
+            top.linkTo(parent.top)
+            centerHorizontallyTo(parent)
+            width = Dimension.fillToConstraints
+        }
+        ) {
+            topBar()
+        }
+
+        Box(
+            Modifier.constrainAs(body) {
+                linkTo(top = title.bottom, bottom = bottomNav.top)
+                linkTo(start = parent.start, end = parent.end)
+                width = Dimension.fillToConstraints
+                height = Dimension.fillToConstraints
+            }
+        ) {
+            children()
+        }
+
+        Box(modifier = Modifier.constrainAs(bottomNav) {
+            bottom.linkTo(parent.bottom)
+            linkTo(parent.start, parent.end)
+            width = Dimension.fillToConstraints
+        }) {
+            bottomBar()
         }
     }
 }
@@ -72,7 +112,9 @@ fun AppController(authViewModel: AuthViewModel) {
 @Composable
 fun AmblorTitle(modifier: Modifier = Modifier) {
     Row(
-        modifier.fillMaxWidth().height(56.dp),
+        modifier
+            .fillMaxWidth()
+            .height(56.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -106,6 +148,7 @@ fun AmblorNavigation(bottomNavController: NavHostController, modifier: Modifier 
                 icon = {
                     Image(
                         it.icon,
+                        contentDescription = null,
                         colorFilter = ColorFilter.tint(AmbientContentColor.current)
                     )
                 },

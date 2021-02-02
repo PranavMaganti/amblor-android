@@ -1,6 +1,5 @@
 build/
 app/build
-models/build
 buildSrc/build
 
 .gradle
@@ -11,5 +10,5 @@ local.properties
 secret.properties
 
 app/google-services.json
-app/release.jks
+app/release-keystore.jks
 app/debug.keystore

@@ -4,10 +4,12 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services")
     kotlin("android")
+    kotlin("plugin.serialization") version Dependencies.Kotlin.version
+    id("com.google.gms.google-services")
     id("kotlin-kapt")
-    id("org.jmailen.kotlinter") version "3.2.0"
+    id("kotlin-parcelize")
+    id("org.jmailen.kotlinter") version "3.3.0"
 }
 
 val secretsProperties = Properties()
@@ -22,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "com.vanpra.amblor"
-        minSdkVersion(23)
+        minSdkVersion(26)
         targetSdkVersion(30)
         versionCode = 1
         versionName = "1.0"
@@ -83,9 +85,7 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = Dependencies.AndroidX.Compose.version
-        kotlinCompilerVersion = Dependencies.Kotlin.version
     }
-
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
@@ -103,8 +103,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 }
 
 dependencies {
-    //Temporary until serialization with Compose is fixed
-    implementation(project(":models"))
     implementation(Dependencies.Kotlin.stdlib)
     implementation(Dependencies.Kotlin.datetime)
 
@@ -127,8 +125,10 @@ dependencies {
     implementation(Dependencies.AndroidX.Compose.navigation)
 
     implementation(Dependencies.AndroidX.coreKtx)
-    implementation(Dependencies.AndroidX.preference)
+    implementation(Dependencies.AndroidX.preferenceKtx)
     implementation(Dependencies.AndroidX.appcompat)
+    implementation(Dependencies.AndroidX.activityKtx)
+    implementation(Dependencies.AndroidX.fragmentKtx)
 
     implementation(Dependencies.AndroidX.Lifecycle.runtime)
     implementation(Dependencies.AndroidX.Lifecycle.viewmodel)
@@ -146,6 +146,7 @@ dependencies {
     implementation(Dependencies.Ktor.json)
     implementation(Dependencies.Ktor.android)
     implementation(Dependencies.Ktor.serialization)
+    implementation(Dependencies.Ktor.auth)
 
     implementation(Dependencies.Koin.core)
     implementation(Dependencies.Koin.compose)

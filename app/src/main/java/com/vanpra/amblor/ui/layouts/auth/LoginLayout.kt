@@ -1,8 +1,10 @@
 package com.vanpra.amblor.ui.layouts.auth
 
+import android.app.Activity
+import android.os.Parcelable
 import android.util.Patterns
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -21,16 +22,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,32 +42,24 @@ import com.vanpra.amblor.AmbientNavHostController
 import com.vanpra.amblor.R
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.ErrorOutlinedTextField
+import com.vanpra.amblor.util.PrimaryTextButton
+import com.vanpra.amblor.util.registerForActivityResult
+import dev.chrisbanes.accompanist.coil.CoilImage
+import kotlinx.parcelize.Parcelize
 
-class TextInputState {
-    val label: String
-    var isInputValid: (String) -> Boolean = { true }
-    private var defaultError: String = ""
+class TextInputState(
+    val label: String,
+    text: String = "",
+    error: Boolean = true,
+    errorMessage: String = "",
+    private val defaultError: String = "",
+    val isInputValid: (String) -> Boolean = { true }
+) {
 
-    var text by mutableStateOf("")
-    var error by mutableStateOf(false)
-    var errorMessage by mutableStateOf("")
+    var text by mutableStateOf(text)
+    var error by mutableStateOf(error)
+    var errorMessage by mutableStateOf(errorMessage)
     var focusRequester = FocusRequester()
-
-    constructor(label: String, errorMessage: String) {
-        this.label = label
-        this.errorMessage = errorMessage
-    }
-
-    constructor(label: String, defaultError: String = "", isInputValid: (String) -> Boolean) {
-        this.label = label
-        this.isInputValid = isInputValid
-        this.defaultError = defaultError
-        this.errorMessage = defaultError
-    }
-
-    constructor(label: String) {
-        this.label = label
-    }
 
     fun isError() = !isValid() && text.isNotEmpty()
     fun isValid() = !error && isInputValid(text)
@@ -80,6 +74,55 @@ class TextInputState {
             errorMessage = defaultError
             error = false
         }
+    }
+
+    companion object {
+        @Parcelize
+        private data class SavedInputData(
+            val text: String,
+            val error: Boolean,
+            val errorMessage: String
+        ) : Parcelable
+
+        fun Saver(
+            label: String,
+            text: String = "",
+            error: Boolean = true,
+            errorMessage: String = "",
+            defaultError: String = "",
+            isInputValid: (String) -> Boolean = { true }
+        ): Saver<TextInputState, *> = Saver(
+            save = { SavedInputData(text, error, errorMessage) },
+            restore = {
+                TextInputState(
+                    label,
+                    it.text,
+                    it.error,
+                    it.errorMessage,
+                    defaultError,
+                    isInputValid
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun rememberTextInputState(
+    label: String,
+    text: String = "",
+    error: Boolean = true,
+    errorMessage: String = "",
+    defaultError: String = "",
+    isInputValid: (String) -> Boolean = { true }
+): TextInputState {
+
+    val saver = remember(text, error, errorMessage) {
+        TextInputState.Saver(label, text, error, errorMessage, defaultError, isInputValid)
+    }
+
+    return rememberSavedInstanceState(text, error, errorMessage, saver = saver) {
+        TextInputState(label, text, error, errorMessage, defaultError, isInputValid)
     }
 }
 
@@ -98,22 +141,25 @@ fun LoginLayout(authViewModel: AuthViewModel) {
     val focusManager = AmbientFocusManager.current
 
     Box(
-        Modifier.fillMaxSize()
-            .clickable(onClick = { focusManager.clearFocus() }, indication = null),
+        Modifier
+            .fillMaxSize()
+            .clickable(
+                onClick = { focusManager.clearFocus() },
+                indication = null,
+                interactionState = InteractionState()
+            ),
         contentAlignment = Alignment.Center
     ) {
-        WithConstraints {
-            Column(Modifier.width(maxWidth * 0.75f)) {
-                Image(
-                    vectorResource(R.drawable.logo),
-                    modifier = Modifier
-                        .padding(start = 30.dp, end = 30.dp, bottom = 30.dp)
-                        .fillMaxWidth(),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
-                )
-                LoginInputLayout(authViewModel)
-                LoginButtonLayout(authViewModel)
-            }
+        Column(Modifier.fillMaxWidth(0.75f)) {
+            CoilImage(
+                R.drawable.logo,
+                contentDescription = null,
+                modifier = Modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)
+                    .size(100.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+            )
+            LoginInputLayout(authViewModel)
+            LoginButtonLayout(authViewModel)
         }
     }
 }
@@ -146,40 +192,44 @@ fun LoginInputLayout(authViewModel: AuthViewModel) {
 fun LoginButtonLayout(authViewModel: AuthViewModel) {
     val authNavController = AmbientNavHostController.current
 
-    // val googleSignInRes = activity.registerForActivityResult(
-    //     ActivityResultContracts.StartActivityForResult()
-    // ) {
-    //     if (it.resultCode == Activity.RESULT_OK) {
-    //     }
-    // }
+    val googleSignInRes =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                authViewModel.signInWithGoogle(it.data!!)
+            }
+        }
 
-    Button(
-        onClick = { authViewModel.signInWithEmail(authNavController) },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("login_submit_btn"),
-        enabled = authViewModel.loginState.isValid()
-    ) {
-        Text("Sign in", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
-    }
+    PrimaryTextButton(
+        text = "Sign in",
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .testTag("login_submit_btn"),
+        onClick = { authViewModel.signInWithEmail() }
+    )
+
+    PrimaryTextButton(
+        text = "Sign up",
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .testTag("signup_btn"),
+        onClick = { authNavController.navigate(route = Screen.EmailSignUp.route) }
+    )
 
     Button(
         onClick = {
-            authNavController.navigate(route = Screen.EmailSignUp.route)
+            googleSignInRes.launch(authViewModel.client.signInIntent)
         },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("signup_btn")
-            .background(MaterialTheme.colors.primaryVariant)
-    ) {
-        Text("Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
-    }
-
-    Button(
-        onClick = {
-            // googleSignInRes.launch(authViewModel.client.signInIntent)
-        },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
     ) {
-        Image(
-            vectorResource(R.drawable.ic_google_icon), Modifier.height(20.dp).padding(end = 16.dp)
+        CoilImage(
+            R.drawable.ic_google_icon,
+            contentDescription = null,
+            Modifier
+                .height(20.dp)
+                .padding(end = 16.dp)
         )
         Text("Sign in with Google", color = Color.DarkGray)
     }

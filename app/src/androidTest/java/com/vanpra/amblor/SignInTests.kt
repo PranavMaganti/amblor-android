@@ -5,8 +5,8 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vanpra.amblor.auth.AuthenticationApi
-import com.vanpra.amblor.auth.InvalidPasswordException
+import com.vanpra.amblor.interfaces.AuthenticationApi
+import com.vanpra.amblor.interfaces.InvalidPasswordException
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

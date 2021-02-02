@@ -14,7 +14,6 @@ import androidx.core.app.NotificationCompat
 import com.vanpra.amblor.R
 import com.vanpra.amblor.repositories.NotificationRepository
 import com.vanpra.amblor.repositories.NotificationSong
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -23,7 +22,6 @@ import org.koin.android.ext.android.inject
 const val CHANNEL_ID = "Amblor"
 const val NOTIFICATION_ID = 1000
 
-@ExperimentalCoroutinesApi
 class AmblorService : NotificationListenerService() {
     lateinit var notificationManager: NotificationManager
     lateinit var sessionManager: SessionManager

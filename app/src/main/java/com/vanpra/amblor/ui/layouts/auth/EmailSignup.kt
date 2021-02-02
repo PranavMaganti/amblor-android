@@ -5,17 +5,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -26,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
@@ -42,11 +39,11 @@ import com.vanpra.amblor.AmbientNavHostController
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.BackButtonTitle
 import com.vanpra.amblor.util.ErrorOutlinedTextField
-import org.koin.androidx.compose.getViewModel
+import com.vanpra.amblor.util.PrimaryTextButton
 import java.util.regex.Pattern
 
-class EmailSignupModel {
-    var email = TextInputState("Email", "Invalid Email") {
+class EmailSignupState {
+    var email = TextInputState("Email", defaultError = "Invalid Email") {
         Patterns.EMAIL_ADDRESS.matcher(it).matches()
     }
     var username = TextInputState("Username")
@@ -72,7 +69,7 @@ class EmailSignupModel {
     }
 
     var confirmPassword =
-        TextInputState("Confirm Password", "Passwords don't match") {
+        TextInputState("Confirm Password", defaultError = "Passwords don't match") {
             it == password.text
         }
 
@@ -81,15 +78,20 @@ class EmailSignupModel {
 }
 
 @Composable
-fun EmailSignup() {
+fun EmailSignup(authViewModel: AuthViewModel) {
     val focusManager = AmbientFocusManager.current
-    val authViewModel = getViewModel<AuthViewModel>()
     val authNavHost = AmbientNavHostController.current
 
     var showingPasswordList by remember { mutableStateOf(false) }
 
     Column(
-        Modifier.clickable(onClick = { focusManager.clearFocus() }, indication = null).fillMaxSize()
+        Modifier
+            .clickable(
+                onClick = { focusManager.clearFocus() },
+                indication = null,
+                interactionState = InteractionState()
+            )
+            .fillMaxSize()
     ) {
         BackButtonTitle(title = "Sign up") {
             authNavHost.navigate(Screen.Login.route)
@@ -150,22 +152,18 @@ fun EmailSignup() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
-                onClick = {
-                    authViewModel.signupWithEmail(authNavHost)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = authViewModel.signupState.detailsValid()
-            ) {
-                Text("Complete Sign up", Modifier.wrapContentWidth(Alignment.CenterHorizontally))
-            }
+            PrimaryTextButton(
+                text = "Complete Sign up",
+                enabled = authViewModel.signupState.detailsValid(),
+                onClick = { authViewModel.signUpWithEmail() }
+            )
         }
     }
 }
 
 @Composable
 private fun PasswordCriteria(
-    signUpModel: EmailSignupModel,
+    signUpModel: EmailSignupState,
     showing: Boolean
 ) {
     AnimatedVisibility(
@@ -205,7 +203,7 @@ private fun PasswordCriteriaItem(text: String, satisfied: Boolean) {
     Row(Modifier.padding(8.dp)) {
         val imageTint = ColorFilter.tint(if (satisfied) Color.Green else Color.Red)
         val image = if (satisfied) Icons.Default.Check else Icons.Default.Close
-        Image(image, colorFilter = imageTint)
+        Image(image, contentDescription = null, colorFilter = imageTint)
         Text(
             text,
             color = MaterialTheme.colors.onBackground,
