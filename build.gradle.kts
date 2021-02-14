@@ -25,6 +25,7 @@ allprojects {
         gradlePluginPortal()
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
         maven("https://kotlin.bintray.com/kotlinx/")
+        maven("https://dl.bintray.com/ekito/koin")
     }
 }
 

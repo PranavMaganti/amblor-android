@@ -1,4 +1,4 @@
-package com.vanpra.amblor.repositories
+package com.vanpra.amblor.util
 
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.auth.AuthProvider

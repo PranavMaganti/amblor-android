@@ -1,6 +1,6 @@
-import java.util.Properties
-import java.io.InputStreamReader
 import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -55,12 +55,14 @@ android {
         }
     }
 
-   packagingOptions.apply {
-       exclude("META-INF/LICENSE")
-       exclude("META-INF/AL2.0")
-       exclude("META-INF/**")
-       exclude("META-INF/*.kotlin_module")
-   }
+    packagingOptions.excludes.addAll(
+        listOf(
+            "META-INF/LICENSE",
+            "META-INF/AL2.0",
+            "META-INF/**",
+            "META-INF/*.kotlin_module"
+        )
+    )
 
     buildTypes {
         getByName("release") {
@@ -92,7 +94,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf(
-            "-Xallow-jvm-ir-dependencies",
             "-Xskip-prerelease-check",
             "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xopt-in=kotlinx.coroutines.FlowPreview",
@@ -117,10 +118,10 @@ dependencies {
     implementation(Dependencies.PlayServices.coroutines)
 
     implementation(Dependencies.AndroidX.Compose.ui)
-    implementation(Dependencies.AndroidX.Compose.foundation)
-    implementation(Dependencies.AndroidX.Compose.foundationLayout)
     implementation(Dependencies.AndroidX.Compose.material)
     implementation(Dependencies.AndroidX.Compose.tooling)
+    implementation(Dependencies.AndroidX.Compose.constraintLayout)
+    implementation(Dependencies.AndroidX.Compose.activity)
     implementation(Dependencies.AndroidX.Compose.materialIconsExtended)
     implementation(Dependencies.AndroidX.Compose.navigation)
 
@@ -149,7 +150,7 @@ dependencies {
     implementation(Dependencies.Ktor.auth)
 
     implementation(Dependencies.Koin.core)
-    implementation(Dependencies.Koin.compose)
+    // implementation(Dependencies.Koin.compose)
     implementation(Dependencies.Koin.ext)
     implementation(Dependencies.Koin.test)
 
@@ -158,9 +159,9 @@ dependencies {
     testImplementation(Dependencies.AndroidX.Testing.core)
 
     androidTestImplementation(Dependencies.AndroidX.Testing.ext)
-    androidTestImplementation(Dependencies.AndroidX.Compose.test)
     androidTestImplementation(Dependencies.AndroidX.Compose.testJunit)
     androidTestImplementation(Dependencies.AndroidX.Compose.ui)
     androidTestImplementation(Dependencies.Mockk.android)
     androidTestImplementation(Dependencies.AndroidX.Testing.runner)
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

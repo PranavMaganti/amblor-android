@@ -16,11 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,24 +32,46 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.vanpra.amblor.ui.layouts.auth.TextInputState
+import org.koin.androidx.viewmodel.ViewModelOwner
+import org.koin.androidx.viewmodel.koin.getViewModel
+import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.Qualifier
 import java.util.UUID
+
+// From koin source (temporary until koin is updated)
+@Composable
+inline fun <reified T : ViewModel> getViewModel(
+    qualifier: Qualifier? = null,
+    noinline parameters: ParametersDefinition? = null,
+): T {
+    val owner = LocalViewModelStoreOwner.current.viewModelStore
+    return remember {
+        GlobalContext.get().getViewModel(
+            qualifier,
+            owner = { ViewModelOwner.from(owner) },
+            parameters = parameters
+        )
+    }
+}
 
 @Composable
 fun BackButton(onClick: () -> Unit) {
@@ -130,9 +154,9 @@ fun ErrorOutlinedTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     showErrorText: Boolean = true
 ) {
-    val focusManager = AmbientFocusManager.current
+    val focusManager = LocalFocusManager.current
     ErrorWrapper(inputState, showErrorText, testTag + "_error") {
-        androidx.compose.material.OutlinedTextField(
+        OutlinedTextField(
             value = inputState.text,
             modifier = modifier
                 .fillMaxWidth()
@@ -145,14 +169,11 @@ fun ErrorOutlinedTextField(
             onTextInputStarted = {
                 inputState.resetError()
             },
+            keyboardActions = KeyboardActions(
+                onNext = { nextInput?.focusRequester?.requestFocus() },
+                onDone = { focusManager.clearFocus() }
+            ),
             visualTransformation = visualTransformation,
-            onImeActionPerformed = { imeAction, _ ->
-                if (imeAction == ImeAction.Next) {
-                    nextInput?.focusRequester?.requestFocus()
-                } else if (imeAction == ImeAction.Done) {
-                    focusManager.clearFocus()
-                }
-            },
             textStyle = TextStyle(MaterialTheme.colors.onBackground, fontSize = 16.sp)
         )
     }
@@ -166,7 +187,7 @@ fun <I, O> registerForActivityResult(
 ): ActivityResultLauncher<I> {
     // First, find the ActivityResultRegistry by casting the Context
     // (which is actually a ComponentActivity) to ActivityResultRegistryOwner
-    val owner = AmbientContext.current as ActivityResultRegistryOwner
+    val owner = LocalContext.current as ActivityResultRegistryOwner
     val activityResultRegistry = owner.activityResultRegistry
 
     // Keep track of the current onResult listener
@@ -174,7 +195,8 @@ fun <I, O> registerForActivityResult(
 
     // It doesn't really matter what the key is, just that it is unique
     // and consistent across configuration changes
-    val key = rememberSavedInstanceState { UUID.randomUUID().toString() }
+    arrayOf<Any?>()
+    val key = rememberSaveable { UUID.randomUUID().toString() }
 
     // Since we don't have a reference to the real ActivityResultLauncher
     // until we register(), we build a layer of indirection so we can

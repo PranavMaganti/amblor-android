@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.navigation.NavHostController
 import androidx.room.Room
-import com.vanpra.amblor.interfaces.AuthenticationApi
-import com.vanpra.amblor.repositories.FirebaseAuthRepository
 import com.vanpra.amblor.data.AmblorDatabase
 import com.vanpra.amblor.interfaces.AmblorApi
+import com.vanpra.amblor.interfaces.AuthenticationApi
 import com.vanpra.amblor.repositories.AmblorApiRepository
+import com.vanpra.amblor.repositories.FirebaseAuthRepository
 import com.vanpra.amblor.repositories.NotificationRepository
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleViewModel

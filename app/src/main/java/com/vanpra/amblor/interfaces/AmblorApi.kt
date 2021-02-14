@@ -26,7 +26,6 @@ data class ScrobbleQuery(
     val time: Int
 )
 
-
 interface AmblorApi {
     suspend fun signUpUser(username: String, idToken: String): Boolean
     suspend fun isUserRegistered(idToken: String): Boolean

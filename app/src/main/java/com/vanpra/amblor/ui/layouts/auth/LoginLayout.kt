@@ -23,22 +23,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.vanpra.amblor.AmbientNavHostController
+import com.vanpra.amblor.LocalNavHostController
 import com.vanpra.amblor.R
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.ErrorOutlinedTextField
@@ -84,7 +84,7 @@ class TextInputState(
             val errorMessage: String
         ) : Parcelable
 
-        fun Saver(
+        fun saver(
             label: String,
             text: String = "",
             error: Boolean = true,
@@ -118,10 +118,10 @@ fun rememberTextInputState(
 ): TextInputState {
 
     val saver = remember(text, error, errorMessage) {
-        TextInputState.Saver(label, text, error, errorMessage, defaultError, isInputValid)
+        TextInputState.saver(label, text, error, errorMessage, defaultError, isInputValid)
     }
 
-    return rememberSavedInstanceState(text, error, errorMessage, saver = saver) {
+    return rememberSaveable(text, error, errorMessage, saver = saver) {
         TextInputState(label, text, error, errorMessage, defaultError, isInputValid)
     }
 }
@@ -138,7 +138,7 @@ data class LoginState(
 
 @Composable
 fun LoginLayout(authViewModel: AuthViewModel) {
-    val focusManager = AmbientFocusManager.current
+    val focusManager = LocalFocusManager.current
 
     Box(
         Modifier
@@ -190,7 +190,7 @@ fun LoginInputLayout(authViewModel: AuthViewModel) {
 
 @Composable
 fun LoginButtonLayout(authViewModel: AuthViewModel) {
-    val authNavController = AmbientNavHostController.current
+    val authNavController = LocalNavHostController.current
 
     val googleSignInRes =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

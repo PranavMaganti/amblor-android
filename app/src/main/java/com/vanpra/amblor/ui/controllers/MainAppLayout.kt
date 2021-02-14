@@ -4,15 +4,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ConstraintLayout
-import androidx.compose.foundation.layout.Dimension
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -21,8 +19,8 @@ import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +31,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,7 +44,7 @@ import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleViewModel
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
-import org.koin.androidx.compose.getViewModel
+import com.vanpra.amblor.util.getViewModel
 
 @Composable
 fun MainAppLayout(authViewModel: AuthViewModel) {
@@ -78,12 +78,13 @@ fun AmblorScaffold(
 ) {
     ConstraintLayout(modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
         val (title, body, bottomNav) = createRefs()
-        Box(modifier =
-        Modifier.constrainAs(title) {
-            top.linkTo(parent.top)
-            centerHorizontallyTo(parent)
-            width = Dimension.fillToConstraints
-        }
+        Box(
+            modifier =
+            Modifier.constrainAs(title) {
+                top.linkTo(parent.top)
+                centerHorizontallyTo(parent)
+                width = Dimension.fillToConstraints
+            }
         ) {
             topBar()
         }
@@ -99,11 +100,13 @@ fun AmblorScaffold(
             children()
         }
 
-        Box(modifier = Modifier.constrainAs(bottomNav) {
-            bottom.linkTo(parent.bottom)
-            linkTo(parent.start, parent.end)
-            width = Dimension.fillToConstraints
-        }) {
+        Box(
+            modifier = Modifier.constrainAs(bottomNav) {
+                bottom.linkTo(parent.bottom)
+                linkTo(parent.start, parent.end)
+                width = Dimension.fillToConstraints
+            }
+        ) {
             bottomBar()
         }
     }
@@ -131,7 +134,7 @@ data class NavigationItem(val name: String, val icon: ImageVector, val state: Sc
 
 @Composable
 fun AmblorNavigation(bottomNavController: NavHostController, modifier: Modifier = Modifier) {
-    var selectedIndex by savedInstanceState { 0 }
+    var selectedIndex by remember { mutableStateOf(0) }
 
     val items = remember {
         listOf(
@@ -149,10 +152,10 @@ fun AmblorNavigation(bottomNavController: NavHostController, modifier: Modifier 
                     Image(
                         it.icon,
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                        colorFilter = ColorFilter.tint(LocalContentColor.current)
                     )
                 },
-                label = { Text(it.name, color = AmbientContentColor.current) },
+                label = { Text(it.name, color = LocalContentColor.current) },
                 alwaysShowLabels = false,
                 selected = index == selectedIndex,
                 onClick = {

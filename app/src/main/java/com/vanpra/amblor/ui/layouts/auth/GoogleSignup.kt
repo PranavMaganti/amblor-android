@@ -10,7 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.vanpra.amblor.util.BackButtonTitle
@@ -19,7 +19,7 @@ import com.vanpra.amblor.util.PrimaryTextButton
 
 @Composable
 fun GoogleSignup(authViewModel: AuthViewModel) {
-    val focusManager = AmbientFocusManager.current
+    val focusManager = LocalFocusManager.current
 
     Column(
         Modifier

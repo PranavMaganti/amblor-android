@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanpra.amblor.data.AmblorDatabase
-import com.vanpra.amblor.interfaces.AuthenticationApi
 import com.vanpra.amblor.interfaces.AmblorApi
+import com.vanpra.amblor.interfaces.AuthenticationApi
 import com.vanpra.amblor.interfaces.ScrobbleData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch

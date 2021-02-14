@@ -29,13 +29,13 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.vanpra.amblor.AmbientNavHostController
+import com.vanpra.amblor.LocalNavHostController
 import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.BackButtonTitle
 import com.vanpra.amblor.util.ErrorOutlinedTextField
@@ -79,8 +79,8 @@ class EmailSignupState {
 
 @Composable
 fun EmailSignup(authViewModel: AuthViewModel) {
-    val focusManager = AmbientFocusManager.current
-    val authNavHost = AmbientNavHostController.current
+    val focusManager = LocalFocusManager.current
+    val authNavHost = LocalNavHostController.current
 
     var showingPasswordList by remember { mutableStateOf(false) }
 

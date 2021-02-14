@@ -7,8 +7,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ConstraintLayout
-import androidx.compose.foundation.layout.Dimension
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.vanpra.amblor.interfaces.ScrobbleData
 import com.vanpra.amblor.util.BackButton
+import com.vanpra.amblor.util.getViewModel
 import com.vanpra.amblor.util.toJavaDate
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,7 +42,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import org.koin.androidx.compose.getViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
