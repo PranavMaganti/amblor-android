@@ -1,22 +1,12 @@
 package com.vanpra.amblor
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vanpra.amblor.data.AmblorDatabase
 import com.vanpra.amblor.interfaces.AmblorApi
@@ -158,6 +148,25 @@ class SignInTests : KoinTest {
                 testUser.email,
                 testUser.password
             )
+        }
+    }
+
+    @Test
+    fun checkSignInButtonDisabledWhenFieldsEmpty() {
+        composeTestRule.launchAmblorApp()
+        composeTestRule.onNodeWithTag("login_submit_btn").assertIsNotEnabled()
+    }
+
+    @Test
+    fun checkInvalidEmailsShowError() {
+        composeTestRule.launchAmblorApp()
+        val emailNode = composeTestRule.onNodeWithTag("login_email_input")
+
+        listOf("hello", "hello@gmail", "hello.com", "hello@.com").forEach {
+            emailNode.performTextInput(it)
+            composeTestRule.onNodeWithTag("login_email_input_error", true).assertIsDisplayed()
+                .assertTextEquals("Invalid Email")
+            emailNode.performTextClearance()
         }
     }
 }
