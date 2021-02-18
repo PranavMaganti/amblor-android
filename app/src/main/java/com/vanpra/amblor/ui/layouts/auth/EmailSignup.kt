@@ -34,55 +34,29 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
-import com.vanpra.amblor.LocalNavHostController
-import com.vanpra.amblor.Screen
 import com.vanpra.amblor.util.BackButtonTitle
+import com.vanpra.amblor.util.EmailSignupState
 import com.vanpra.amblor.util.ErrorOutlinedTextField
 import com.vanpra.amblor.util.PrimaryTextButton
+import com.vanpra.amblor.util.TextInputState
+import com.vanpra.amblor.util.rememberTextInputState
 import java.util.regex.Pattern
-
-class EmailSignupState {
-    var email = TextInputState("Email", defaultError = "Invalid Email") {
-        Patterns.EMAIL_ADDRESS.matcher(it).matches()
-    }
-    var username = TextInputState("Username")
-    var password = TextInputState("Password") { password ->
-        if (password.length < 8) {
-            return@TextInputState false
-        }
-
-        val patterns = listOf(
-            ".*[0-9].*",
-            ".*[A-Z].*",
-            ".*[a-z].*",
-            ".*[~!@#\$%\\^&*()\\-_=+\\|\\[{\\]};:'\",<.>/?].*"
-        )
-
-        patterns.forEach {
-            if (!Pattern.compile(it).matcher(password).matches()) {
-                return@TextInputState false
-            }
-        }
-
-        return@TextInputState true
-    }
-
-    var confirmPassword =
-        TextInputState("Confirm Password", defaultError = "Passwords don't match") {
-            it == password.text
-        }
-
-    fun detailsValid() =
-        username.isValid() && email.isValid() && password.isValid() && confirmPassword.isValid()
-}
 
 @Composable
 fun EmailSignup(authViewModel: AuthViewModel) {
     val focusManager = LocalFocusManager.current
-    val authNavHost = LocalNavHostController.current
-
     var showingPasswordList by remember { mutableStateOf(false) }
+
+    val email = rememberTextInputState("Email", defaultError = "Invalid Email") {
+        Patterns.EMAIL_ADDRESS.matcher(it).matches()
+    }
+    val username = rememberTextInputState("Username")
+    val password = rememberTextInputState("Password") { EmailSignupState.isPasswordValid(it) }
+    val confirmPassword =
+        rememberTextInputState("Confirm Password", defaultError = "Passwords don't match") {
+            it == password.text
+        }
+
 
     Column(
         Modifier
@@ -94,34 +68,34 @@ fun EmailSignup(authViewModel: AuthViewModel) {
             .fillMaxSize()
     ) {
         BackButtonTitle(title = "Sign up") {
-            authNavHost.navigate(Screen.Login.route)
+            authViewModel.signOut()
         }
 
         Column(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorOutlinedTextField(
-                inputState = authViewModel.signupState.email,
+                inputState = email,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Email
                 ),
-                nextInput = authViewModel.signupState.username
+                nextInput = username
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ErrorOutlinedTextField(
-                inputState = authViewModel.signupState.username,
+                inputState = username,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text
                 ),
-                nextInput = authViewModel.signupState.password
+                nextInput = password
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ErrorOutlinedTextField(
-                inputState = authViewModel.signupState.password,
+                inputState = password,
                 modifier = Modifier.onFocusChanged {
                     showingPasswordList = it.isFocused
                 },
@@ -130,19 +104,19 @@ fun EmailSignup(authViewModel: AuthViewModel) {
                     keyboardType = KeyboardType.Password
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                nextInput = authViewModel.signupState.confirmPassword,
+                nextInput = confirmPassword,
                 showErrorText = false
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             PasswordCriteria(
-                signUpModel = authViewModel.signupState,
+                passwordState = password,
                 showing = showingPasswordList
             )
 
             ErrorOutlinedTextField(
-                inputState = authViewModel.signupState.confirmPassword,
+                inputState = confirmPassword,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
@@ -154,8 +128,8 @@ fun EmailSignup(authViewModel: AuthViewModel) {
 
             PrimaryTextButton(
                 text = "Complete Sign up",
-                enabled = authViewModel.signupState.detailsValid(),
-                onClick = { authViewModel.signUpWithEmail() }
+                enabled = EmailSignupState.detailsValid(email, username, password, confirmPassword),
+                onClick = { authViewModel.signUpWithEmail(email, username, password) }
             )
         }
     }
@@ -163,7 +137,7 @@ fun EmailSignup(authViewModel: AuthViewModel) {
 
 @Composable
 private fun PasswordCriteria(
-    signUpModel: EmailSignupState,
+    passwordState: TextInputState,
     showing: Boolean
 ) {
     AnimatedVisibility(
@@ -174,25 +148,25 @@ private fun PasswordCriteria(
         Column {
             PasswordCriteriaItem(
                 text = "At least 8 characters long",
-                satisfied = signUpModel.password.text.length >= 8
+                satisfied = passwordState.text.length >= 8
             )
             PasswordCriteriaItem(
                 text = "At least 1 uppercase letter",
                 satisfied = Pattern.compile(
                     ".*[A-Z].*"
-                ).matcher(signUpModel.password.text).matches()
+                ).matcher(passwordState.text).matches()
             )
             PasswordCriteriaItem(
                 text = "At least 1 number",
                 satisfied = Pattern.compile(
                     ".*[0-9].*"
-                ).matcher(signUpModel.password.text).matches()
+                ).matcher(passwordState.text).matches()
             )
             PasswordCriteriaItem(
                 text = "At least 1 special character",
                 satisfied = Pattern.compile(
                     ".*[~!@#\$%^&*()\\-_=+|\\[{\\]};:'\",<.>/?].*"
-                ).matcher(signUpModel.password.text).matches()
+                ).matcher(passwordState.text).matches()
             )
         }
     }

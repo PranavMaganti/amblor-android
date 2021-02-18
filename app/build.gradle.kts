@@ -4,9 +4,9 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    kotlin("android")
     kotlin("plugin.serialization") version Dependencies.Kotlin.version
     id("com.google.gms.google-services")
+    id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("org.jmailen.kotlinter") version "3.3.0"

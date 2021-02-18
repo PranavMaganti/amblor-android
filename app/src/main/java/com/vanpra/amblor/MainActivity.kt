@@ -10,18 +10,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.popUpTo
 import androidx.navigation.compose.rememberNavController
-import com.vanpra.amblor.interfaces.AmblorApi
-import com.vanpra.amblor.interfaces.AuthenticationApi
 import com.vanpra.amblor.service.AmblorService
 import com.vanpra.amblor.ui.controllers.MainAppLayout
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
@@ -30,15 +26,10 @@ import com.vanpra.amblor.ui.layouts.auth.EmailVerification
 import com.vanpra.amblor.ui.layouts.auth.GoogleSignup
 import com.vanpra.amblor.ui.layouts.auth.LoginLayout
 import com.vanpra.amblor.ui.theme.AmblorTheme
-import com.vanpra.amblor.util.LoadingScreen
 import com.vanpra.amblor.util.getViewModel
 import dev.chrisbanes.accompanist.insets.systemBarsPadding
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.parameter.parametersOf
-
-val LocalNavHostController = staticCompositionLocalOf<NavHostController>()
 
 sealed class Screen(val route: String) {
     object App : Screen("App")
@@ -49,35 +40,14 @@ sealed class Screen(val route: String) {
     object GoogleSignUp : Screen("GoogleSignUp")
     object EmailSignUp : Screen("EmailSignUp")
     object EmailVerification : Screen("EmailVerification")
-    object Loading : Screen("Loading")
+    object Auth : Screen("auth")
 }
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        val auth by inject<AuthenticationApi>()
-        val userApi by inject<AmblorApi>()
-
-        setContent {
-            val coroutineScope = rememberCoroutineScope()
-            val navHostController = rememberNavController()
-
-            coroutineScope.launch {
-                if (!auth.isUserSignedIn()) {
-                    navHostController.navigate(Screen.Login.route)
-                } else if (!auth.isUserEmailVerified()) {
-                    navHostController.navigate(Screen.EmailVerification.route)
-                } else if (!userApi.isUserRegistered(auth.getToken())) {
-                    navHostController.navigate(Screen.GoogleSignUp.route)
-                } else {
-                    navHostController.navigate(Screen.App.route)
-                }
-            }
-
-            MainLayout(Screen.Loading, navHostController)
-        }
+        setContent { MainLayout() }
     }
 
     @KoinApiExtension
@@ -95,11 +65,9 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun MainLayout(
-    startScreen: Screen = Screen.Login,
-    navHostController: NavHostController = rememberNavController()
-) {
+fun MainLayout(startScreen: Screen = Screen.Auth) {
     AmblorTheme {
+        val navHostController = rememberNavController()
         val authViewModel = getViewModel<AuthViewModel> { parametersOf(navHostController) }
 
         Box(
@@ -108,17 +76,24 @@ fun MainLayout(
                 .background(MaterialTheme.colors.background)
                 .systemBarsPadding()
         ) {
-            Providers(LocalNavHostController provides navHostController) {
-                NavHost(
-                    navController = navHostController,
-                    startDestination = startScreen.route
-                ) {
-                    composable(Screen.App.route) { MainAppLayout(authViewModel) }
+            NavHost(
+                navController = navHostController,
+                startDestination = startScreen.route
+            ) {
+                navigation(Screen.Login.route, Screen.Auth.route) {
                     composable(Screen.Login.route) { LoginLayout(authViewModel) }
                     composable(Screen.GoogleSignUp.route) { GoogleSignup(authViewModel) }
                     composable(Screen.EmailSignUp.route) { EmailSignup(authViewModel) }
-                    composable(Screen.Loading.route) { LoadingScreen() }
                     composable(Screen.EmailVerification.route) { EmailVerification(authViewModel) }
+                }
+                composable(Screen.App.route) {
+                    MainAppLayout {
+                        navHostController.navigate(Screen.Auth.route) {
+                            popUpTo(Screen.Login.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 }
             }
         }

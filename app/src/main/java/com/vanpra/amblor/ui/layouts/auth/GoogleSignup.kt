@@ -16,10 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.vanpra.amblor.util.BackButtonTitle
 import com.vanpra.amblor.util.ErrorOutlinedTextField
 import com.vanpra.amblor.util.PrimaryTextButton
+import com.vanpra.amblor.util.TextInputState
 
 @Composable
 fun GoogleSignup(authViewModel: AuthViewModel) {
     val focusManager = LocalFocusManager.current
+    val googleSignUpState = TextInputState(label = "Username", defaultError = "Username Taken")
 
     Column(
         Modifier
@@ -36,15 +38,15 @@ fun GoogleSignup(authViewModel: AuthViewModel) {
         }
         Column(Modifier.padding(start = 16.dp, end = 16.dp)) {
             ErrorOutlinedTextField(
-                inputState = authViewModel.googleSignupState,
+                inputState = googleSignUpState,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             )
 
             PrimaryTextButton(
                 text = "Complete Sign up",
                 modifier = Modifier.padding(vertical = 24.dp),
-                enabled = authViewModel.googleSignupState.text != "",
-                onClick = { authViewModel.signUpWithGoogle() }
+                enabled = googleSignUpState.text != "",
+                onClick = { authViewModel.signUpWithGoogle(googleSignUpState) }
             )
         }
     }

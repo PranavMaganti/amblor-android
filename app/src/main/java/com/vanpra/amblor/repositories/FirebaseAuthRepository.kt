@@ -1,5 +1,6 @@
 package com.vanpra.amblor.repositories
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -12,7 +13,7 @@ import com.vanpra.amblor.interfaces.InvalidPasswordException
 import com.vanpra.amblor.interfaces.UserAlreadyRegisteredException
 import kotlinx.coroutines.tasks.await
 
-class FirebaseAuthRepository : AuthenticationApi {
+class FirebaseAuthRepository(override val googleClient: GoogleSignInClient) : AuthenticationApi {
     private val actionCodeSettings = ActionCodeSettings.newBuilder()
         .setUrl("https://amblor.page.link")
         .setHandleCodeInApp(true)
@@ -51,8 +52,9 @@ class FirebaseAuthRepository : AuthenticationApi {
         return Firebase.auth.currentUser!!.getIdToken(true).await().token!!
     }
 
-    override fun signOut() {
+    override suspend fun signOut() {
         Firebase.auth.signOut()
+        googleClient.signOut().await()
     }
 
     override fun isUserSignedIn(): Boolean {

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -49,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.vanpra.amblor.ui.layouts.auth.TextInputState
 import org.koin.androidx.viewmodel.ViewModelOwner
 import org.koin.androidx.viewmodel.koin.getViewModel
 import org.koin.core.context.GlobalContext
@@ -116,30 +113,19 @@ fun BackButtonTitle(title: String, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun LoadingScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorWrapper(
+private fun TextInputErrorText(
     textInputState: TextInputState,
-    showErrorText: Boolean,
+    showText: Boolean,
     testTag: String,
-    children: @Composable () -> Unit
 ) {
-    Column(Modifier.fillMaxWidth()) {
-        children()
-        if (textInputState.isError() && showErrorText) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Text(
-                    textInputState.errorMessage,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.error,
-                    modifier = Modifier.testTag(testTag)
-                )
-            }
+    if (textInputState.isError() && showText) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Text(
+                textInputState.errorMessage,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.error,
+                modifier = Modifier.testTag(testTag)
+            )
         }
     }
 }
@@ -155,7 +141,8 @@ fun ErrorOutlinedTextField(
     showErrorText: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
-    ErrorWrapper(inputState, showErrorText, testTag + "_error") {
+
+    Column {
         OutlinedTextField(
             value = inputState.text,
             modifier = modifier
@@ -165,7 +152,9 @@ fun ErrorOutlinedTextField(
             label = { Text(inputState.label) },
             keyboardOptions = keyboardOptions.copy(autoCorrect = false),
             onValueChange = { value -> inputState.text = value },
-            isErrorValue = inputState.isError(),
+            // Bug causing instrumentation tests to fail. Bug reported:
+            // https://issuetracker.google.com/issues/180513112
+            // isErrorValue = inputState.isError(),
             onTextInputStarted = {
                 inputState.resetError()
             },
@@ -176,6 +165,7 @@ fun ErrorOutlinedTextField(
             visualTransformation = visualTransformation,
             textStyle = TextStyle(MaterialTheme.colors.onBackground, fontSize = 16.sp)
         )
+        TextInputErrorText(inputState, showErrorText, testTag + "_error")
     }
 }
 

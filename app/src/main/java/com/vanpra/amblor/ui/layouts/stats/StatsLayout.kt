@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import com.vanpra.amblor.util.getViewModel
 
 @Composable
-fun StatsLayout() {
-    val viewModel = getViewModel<StatsViewModel>()
+fun StatsLayout(viewModel: StatsViewModel) {
     // val viewState = viewModel.viewState.collectAsState()
 }

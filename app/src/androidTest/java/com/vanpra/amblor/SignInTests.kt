@@ -1,9 +1,22 @@
 package com.vanpra.amblor
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vanpra.amblor.data.AmblorDatabase
 import com.vanpra.amblor.interfaces.AmblorApi
@@ -106,7 +119,7 @@ class SignInTests : KoinTest {
 
         composeTestRule.launchAmblorApp()
         composeTestRule.loginWithUser(testUser)
-        composeTestRule.onNodeWithTag("login_email_input_error", true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("login_email_input_error", true)
             .assertTextEquals("Email not registered")
 
         coVerify(exactly = 1) { authApi.fetchSignInMethodsForEmail(testUser.email) }

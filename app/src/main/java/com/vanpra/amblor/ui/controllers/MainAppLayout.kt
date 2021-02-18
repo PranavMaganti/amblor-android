@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -39,75 +41,42 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.vanpra.amblor.Screen
-import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.profile.ProfileLayout
+import com.vanpra.amblor.ui.layouts.profile.ProfileViewModel
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleLayout
 import com.vanpra.amblor.ui.layouts.scrobble.ScrobbleViewModel
 import com.vanpra.amblor.ui.layouts.stats.StatsLayout
+import com.vanpra.amblor.ui.layouts.stats.StatsViewModel
 import com.vanpra.amblor.util.getViewModel
 
 @Composable
-fun MainAppLayout(authViewModel: AuthViewModel) {
+fun MainAppLayout(navigateToLogin: () -> Unit) {
     Box {
         val bottomNavController = rememberNavController()
         val scrobbleViewModel = getViewModel<ScrobbleViewModel>()
+        val statsViewModel = getViewModel<StatsViewModel>()
+        val profileViewModel = getViewModel<ProfileViewModel>()
 
-        AmblorScaffold(
+        Scaffold(
             modifier = Modifier.testTag("app_scaffold"),
             topBar = { AmblorTitle() },
             bottomBar = { AmblorNavigation(bottomNavController) }
         ) {
-            NavHost(
-                navController = bottomNavController,
-                startDestination = Screen.Scrobbles.route
-            ) {
-                composable(Screen.Scrobbles.route) { ScrobbleLayout(scrobbleViewModel) }
-                composable(Screen.Stats.route) { StatsLayout() }
-                composable(Screen.Profile.route) { ProfileLayout(authViewModel) }
+            Box(Modifier.padding(it)) {
+                NavHost(
+                    navController = bottomNavController,
+                    startDestination = Screen.Scrobbles.route
+                ) {
+                    composable(Screen.Scrobbles.route) { ScrobbleLayout(scrobbleViewModel) }
+                    composable(Screen.Stats.route) { StatsLayout(statsViewModel) }
+                    composable(Screen.Profile.route) {
+                        ProfileLayout(
+                            profileViewModel,
+                            navigateToLogin
+                        )
+                    }
+                }
             }
-        }
-    }
-}
-
-@Composable
-fun AmblorScaffold(
-    modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit,
-    children: @Composable () -> Unit
-) {
-    ConstraintLayout(modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
-        val (title, body, bottomNav) = createRefs()
-        Box(
-            modifier =
-            Modifier.constrainAs(title) {
-                top.linkTo(parent.top)
-                centerHorizontallyTo(parent)
-                width = Dimension.fillToConstraints
-            }
-        ) {
-            topBar()
-        }
-
-        Box(
-            Modifier.constrainAs(body) {
-                linkTo(top = title.bottom, bottom = bottomNav.top)
-                linkTo(start = parent.start, end = parent.end)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            }
-        ) {
-            children()
-        }
-
-        Box(
-            modifier = Modifier.constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                linkTo(parent.start, parent.end)
-                width = Dimension.fillToConstraints
-            }
-        ) {
-            bottomBar()
         }
     }
 }
