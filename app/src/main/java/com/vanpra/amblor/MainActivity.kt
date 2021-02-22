@@ -19,7 +19,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.popUpTo
 import androidx.navigation.compose.rememberNavController
 import com.vanpra.amblor.service.AmblorService
-import com.vanpra.amblor.ui.controllers.MainAppLayout
+import com.vanpra.amblor.ui.layouts.MainAppLayout
 import com.vanpra.amblor.ui.layouts.auth.AuthViewModel
 import com.vanpra.amblor.ui.layouts.auth.EmailSignup
 import com.vanpra.amblor.ui.layouts.auth.EmailVerification

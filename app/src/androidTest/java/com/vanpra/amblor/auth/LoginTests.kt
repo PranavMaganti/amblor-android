@@ -1,4 +1,4 @@
-package com.vanpra.amblor
+package com.vanpra.amblor.auth
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -12,6 +12,9 @@ import com.vanpra.amblor.data.AmblorDatabase
 import com.vanpra.amblor.interfaces.AmblorApi
 import com.vanpra.amblor.interfaces.AuthenticationApi
 import com.vanpra.amblor.interfaces.InvalidPasswordException
+import com.vanpra.amblor.loginWithUser
+import com.vanpra.amblor.setAmblorLayout
+import com.vanpra.amblor.testUser
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -26,14 +29,11 @@ import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 
-data class User(val email: String, val password: String, val username: String, val token: String)
-
 @RunWith(AndroidJUnit4::class)
-class SignInTests : KoinTest {
+class LoginTests : KoinTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val testUser = User("testemail@emailservice.com", "password", "test", "token")
     private lateinit var authApi: AuthenticationApi
 
     @Before
@@ -70,7 +70,7 @@ class SignInTests : KoinTest {
             )
         }
 
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("app_scaffold").assertIsDisplayed()
 
@@ -93,7 +93,7 @@ class SignInTests : KoinTest {
             )
         }
 
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("app_scaffold").assertIsDisplayed()
 
@@ -107,7 +107,7 @@ class SignInTests : KoinTest {
     fun checkEmailErrorWhenNotRegistered() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf()
 
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_email_input_error", true)
             .assertTextEquals("Email not registered")
@@ -119,7 +119,7 @@ class SignInTests : KoinTest {
     fun checkEmailErrorWhenRegWithDifferentProvider() {
         coEvery { authApi.fetchSignInMethodsForEmail(testUser.email) } returns listOf("Google")
 
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_email_input_error", true).assertIsDisplayed()
             .assertTextEquals("Email registered with different provider")
@@ -137,7 +137,7 @@ class SignInTests : KoinTest {
             )
         } throws InvalidPasswordException("Invalid password given")
 
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.loginWithUser(testUser)
         composeTestRule.onNodeWithTag("login_password_input_error", true).assertIsDisplayed()
             .assertTextEquals("Invalid Password")
@@ -153,13 +153,13 @@ class SignInTests : KoinTest {
 
     @Test
     fun checkSignInButtonDisabledWhenFieldsEmpty() {
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         composeTestRule.onNodeWithTag("login_submit_btn").assertIsNotEnabled()
     }
 
     @Test
     fun checkInvalidEmailsShowError() {
-        composeTestRule.launchAmblorApp()
+        composeTestRule.setAmblorLayout()
         val emailNode = composeTestRule.onNodeWithTag("login_email_input")
 
         listOf("hello", "hello@gmail", "hello.com", "hello@.com").forEach {

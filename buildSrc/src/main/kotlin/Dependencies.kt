@@ -1,5 +1,5 @@
 object Dependencies {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha06"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha07"
     const val material = "com.google.android.material:material:1.3.0-rc01"
     const val googleServicesPlugin = "com.google.gms:google-services:4.3.5"
 

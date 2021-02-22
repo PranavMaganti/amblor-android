@@ -30,6 +30,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -57,7 +58,6 @@ fun EmailSignup(authViewModel: AuthViewModel) {
             it == password.text
         }
 
-
     Column(
         Modifier
             .clickable(
@@ -78,7 +78,8 @@ fun EmailSignup(authViewModel: AuthViewModel) {
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Email
                 ),
-                nextInput = username
+                nextInput = username,
+                testTag = "email_signup"
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -89,7 +90,8 @@ fun EmailSignup(authViewModel: AuthViewModel) {
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text
                 ),
-                nextInput = password
+                nextInput = password,
+                testTag = "username_signup"
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -105,7 +107,8 @@ fun EmailSignup(authViewModel: AuthViewModel) {
                 ),
                 visualTransformation = PasswordVisualTransformation(),
                 nextInput = confirmPassword,
-                showErrorText = false
+                showErrorText = false,
+                testTag = "password_signup"
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -121,13 +124,15 @@ fun EmailSignup(authViewModel: AuthViewModel) {
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Password
-                )
+                ),
+                testTag = "confirm_password_signup"
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             PrimaryTextButton(
                 text = "Complete Sign up",
+                modifier = Modifier.testTag("complete_signup_btn"),
                 enabled = EmailSignupState.detailsValid(email, username, password, confirmPassword),
                 onClick = { authViewModel.signUpWithEmail(email, username, password) }
             )

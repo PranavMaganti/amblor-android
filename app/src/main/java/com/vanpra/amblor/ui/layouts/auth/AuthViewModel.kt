@@ -100,11 +100,9 @@ class AuthViewModel(
                 } else {
                     auth.deleteCurrentUser()
                     username.showError("Username Taken")
-                    navHostController.navigate(Screen.EmailSignUp.route)
                 }
             } catch (e: UserAlreadyRegisteredException) {
                 email.showError("Email already used")
-                navHostController.navigate(Screen.EmailSignUp.route)
             }
         }
 

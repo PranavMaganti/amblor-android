@@ -26,6 +26,7 @@ allprojects {
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
         maven("https://kotlin.bintray.com/kotlinx/")
         maven("https://dl.bintray.com/ekito/koin")
+        maven("https://androidx.dev/snapshots/builds/7163299/artifacts/repository")
     }
 }
 

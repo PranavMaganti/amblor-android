@@ -9,12 +9,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileLayout(profileViewModel: ProfileViewModel, navigateToLogin: () -> Unit) {
     val coroutineContext = rememberCoroutineScope()
-    Button(onClick = {
-        coroutineContext.launch {
-            profileViewModel.signOut()
-            navigateToLogin()
+    Button(
+        onClick = {
+            coroutineContext.launch {
+                profileViewModel.signOut()
+                navigateToLogin()
+            }
         }
-    }) {
+    ) {
         Text("Sign Out")
     }
 }

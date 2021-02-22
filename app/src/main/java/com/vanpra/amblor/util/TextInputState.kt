@@ -1,7 +1,6 @@
 package com.vanpra.amblor.util
 
 import android.os.Parcelable
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,6 @@ class TextInputState(
     var error by mutableStateOf(error)
     var errorMessage by mutableStateOf(errorMessage)
     var focusRequester = FocusRequester()
-
 
     /* Two different functions as button should be disabled when input is empty but the text fields
        should not be red. Therefore use isValid for TF and isError for button */
