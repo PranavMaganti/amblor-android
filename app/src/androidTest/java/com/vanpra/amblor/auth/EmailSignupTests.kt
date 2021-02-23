@@ -60,14 +60,14 @@ class EmailSignupTests : KoinTest {
     }
 
     @Test
-    fun `check signup button disabled when all fields empty`() {
+    fun checkSignupButtonDisabledWhenAllFieldsEmpty() {
         composeTestRule.setAmblorLayout()
         composeTestRule.onNodeWithTag("signup_btn", true).performClick()
         composeTestRule.onNodeWithTag("complete_signup_btn", true).assertIsNotEnabled()
     }
 
     @Test
-    fun `check used username displays error`() {
+    fun checkUsedUsernameDisplaysError() {
         coEvery { authApi.getToken() } returns testUser.token
         coEvery { amblorApi.signUpUser(testUser.username, testUser.token) } returns false
 
