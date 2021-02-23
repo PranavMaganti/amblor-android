@@ -154,7 +154,7 @@ fun ErrorOutlinedTextField(
             onValueChange = { value -> inputState.text = value },
             // Bug causing instrumentation tests to fail. Bug reported:
             // https://issuetracker.google.com/issues/180513112
-            isErrorValue = inputState.isError(),
+            // isErrorValue = inputState.isError(),
             onTextInputStarted = {
                 inputState.resetError()
             },
